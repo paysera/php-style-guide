@@ -1,1 +1,4 @@
-# php-style-guide
+Paysera PHP style guide
+=====
+
+**SOON**
