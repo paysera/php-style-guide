@@ -1,86 +1,86 @@
 ## Table of Contents
 
-1. [Basics](#Basics)
+1. [Basics](#basics)
 
-    1.1. [PHP code-level](#PHP-code-level)
+    1.1. [PHP code-level](#php-code-level)
 
-    1.2. [Globals](#Globals)
+    1.2. [Globals](#globals)
 
-    1.3. [Files](#Files)
+    1.3. [Files](#files)
 
-    1.4. [Exceptions for code style usage](#Exceptions-for-code-style-usage)
+    1.4. [Exceptions for code style usage](#exceptions-for-code-style-usage)
 
-2. [Code style](#Code-style)
+2. [Code style](#code-style)
 
-    2.1. [Commas in arrays](#Commas-in-arrays)
+    2.1. [Commas in arrays](#commas-in-arrays)
     
-    2.2. [Splitting in several lines](#Splitting-in-several-lines)
+    2.2. [Splitting in several lines](#splitting-in-several-lines)
     
-    2.3. [Chained method calls](#Chained-method-calls)
+    2.3. [Chained method calls](#chained-method-calls)
     
-    2.4. [Constructors](#Constructors)
+    2.4. [Constructors](#constructors)
     
-    2.5. [Variable, class and function naming](#Variable,-class-and-function-naming)
+    2.5. [Variable, class and function naming](#variable,-class-and-function-naming)
     
-    2.5.1. [Full names](#Full-names)
+    2.5.1. [Full names](#full-names)
     
-    2.5.2. [Class naming](#Class-naming)
+    2.5.2. [Class naming](#class-naming)
     
-    2.5.3. [Interface naming](#Interface-naming)
+    2.5.3. [Interface naming](#interface-naming)
     
-    2.5.4. [Property naming](#Property-naming)
+    2.5.4. [Property naming](#property-naming)
     
-    2.5.5. [Method naming](#Method-naming)
+    2.5.5. [Method naming](#method-naming)
 
-    2.6. [Order of methods](#Order-of-methods)
+    2.6. [Order of methods](#order-of-methods)
 
-    2.7. [Directories and namespaces](#Directories-and-namespaces)
+    2.7. [Directories and namespaces](#directories-and-namespaces)
 
-    2.7.1. [Singular namespaces](#Singular-namespaces)
+    2.7.1. [Singular namespaces](#singular-namespaces)
 
-    2.7.2. [No *Interface namespaces](#No-*Interface-namespaces)
+    2.7.2. [No *Interface namespaces](#no-*interface-namespaces)
 
-    2.7.3. [Different namespaces and service names](#Different-namespaces-and-service-names)
+    2.7.3. [Different namespaces and service names](#different-namespaces-and-service-names)
 
-    2.8. [Comparison order](#Comparison-order)
+    2.8. [Comparison order](#comparison-order)
 
-    2.9. [Namespaces and use statements](#Namespaces-and-use-statements)
+    2.9. [Namespaces and use statements](#namespaces-and-use-statements)
 
-3. [Usage of PHP features](#Usage-of-PHP-features)
+3. [Usage of PHP features](#usage-of-php-features)
 
-    3.1. [Condition results](#Condition-results)
+    3.1. [Condition results](#condition-results)
 
-    3.2. [Logical operators](#Logical-operators)
+    3.2. [Logical operators](#logical-operators)
     
-    3.3. [Strict comparison operators](#Strict-comparison-operators)
+    3.3. [Strict comparison operators](#strict-comparison-operators)
     
-    3.4. [Converting to boolean](#Converting-to-boolean)
+    3.4. [Converting to boolean](#converting-to-boolean)
     
-    3.5. [Comparing to boolean](#Comparing-to-boolean)
+    3.5. [Comparing to boolean](#comparing-to-boolean)
     
-    3.6. [Comparing to null](#Comparing-to-null)
+    3.6. [Comparing to null](#comparing-to-null)
     
-    3.7. [Assignments in conditions](#Assignments-in-conditions)
+    3.7. [Assignments in conditions](#assignments-in-conditions)
     
-    3.8. [Unnecessary variables](#Unnecessary-variables)
+    3.8. [Unnecessary variables](#unnecessary-variables)
     
-    3.9. [Reusing variables](#Reusing-variables)
+    3.9. [Reusing variables](#reusing-variables)
     
-    3.10. [Unnecessary structures](#Unnecessary-structures)
+    3.10. [Unnecessary structures](#unnecessary-structures)
     
-    3.11. [Static methods](#Static-methods)
+    3.11. [Static methods](#static-methods)
     
-    3.12. [Converting to string](#Converting-to-string)
+    3.12. [Converting to string](#converting-to-string)
     
-    3.13. [Double quotes](#Double-quotes)
+    3.13. [Double quotes](#double-quotes)
     
-    3.14. [Visibility](#Visibility)
+    3.14. [Visibility](#visibility)
     
-    3.14.1. [Public properties](#Public-properties)
+    3.14.1. [Public properties](#public-properties)
     
-    3.14.2. [Protected vs private](#Protected-vs-private)
+    3.14.2. [Protected vs private](#protected-vs-private)
     
-    3.15. [Functions](#Functions)
+    3.15. [Functions](#functions)
     
     3.15.1. [count](#count)
     
@@ -88,59 +88,59 @@
     
     3.16. [str_replace](#str_replace)
     
-    3.17. [Return and argument types](#Return-and-argument-types)
+    3.17. [Return and argument types](#return-and-argument-types)
     
-    3.17.1. [Return types](#Return-types)
+    3.17.1. [Return types](#return-types)
     
-    3.17.2. [Argument types](#Argument-types)
+    3.17.2. [Argument types](#argument-types)
     
-    3.17.3. [Passing ID](#Passing-ID)
+    3.17.3. [Passing ID](#passing-id)
     
-    3.17.4. [Typehinting optional arguments](#Typehinting-optional-arguments)
+    3.17.4. [Typehinting optional arguments](#typehinting-optional-arguments)
     
-    3.17.5. [Void result](#Void-result)
+    3.17.5. [Void result](#void-result)
     
-    3.18. [Typehinting](#Typehinting)
+    3.18. [Typehinting](#typehinting)
     
-    3.18.1. [Dependencies with several interfaces](#Dependencies-with-several-interfaces)
+    3.18.1. [Dependencies with several interfaces](#dependencies-with-several-interfaces)
     
-    3.19. [Dates](#Dates)
+    3.19. [Dates](#dates)
     
-    3.20. [Exceptions](#Exceptions)
+    3.20. [Exceptions](#exceptions)
     
-    3.20.1. [Throwing](#Throwing)
+    3.20.1. [Throwing](#throwing)
     
-    3.20.2. [Catching](#Catching)
+    3.20.2. [Catching](#catching)
     
-    3.21. [Checking things explicitly](#Checking-things-explicitly)
+    3.21. [Checking things explicitly](#checking-things-explicitly)
     
-    3.22. [Calling parent constructor](#Calling-parent-constructor)
+    3.22. [Calling parent constructor](#calling-parent-constructor)
     
-    3.23. [Traits](#Traits)
+    3.23. [Traits](#traits)
     
-    3.24. [Arrays](#Arrays)
+    3.24. [Arrays](#arrays)
     
-    3.25. [Default property values](#Default-property-values)
+    3.25. [Default property values](#default-property-values)
     
-4. [Comments](#Comments)
+4. [Comments](#comments)
 
-    4.1. [PhpDoc on methods](#PhpDoc-on-methods)
+    4.1. [PhpDoc on methods](#phpdoc-on-methods)
     
-    4.2. [PhpDoc contents](#PhpDoc-contents)
+    4.2. [PhpDoc contents](#phpdoc-contents)
     
-    4.3. [PhpDoc on properties](#PhpDoc-on-properties)
+    4.3. [PhpDoc on properties](#phpdoc-on-properties)
     
-    4.4. [Fluid interface](#Fluid-interface)
+    4.4. [Fluid interface](#fluid-interface)
     
-    4.5. [Multiple return types](#Multiple-return-types)
+    4.5. [Multiple return types](#multiple-return-types)
     
-    4.6. [Deprecations](#Deprecations)
+    4.6. [Deprecations](#deprecations)
     
-    4.7. [Additional comments](#Additional-comments)
+    4.7. [Additional comments](#additional-comments)
     
-    4.8. [Comment styles](#Comment-styles)
+    4.8. [Comment styles](#comment-styles)
    
-5. [IDE Warnings](#IDE-Warnings)
+5. [IDE Warnings](#ide-warnings)
 
 
 Basics

@@ -17,169 +17,169 @@ Table Of Contents
     
     1.3.2. [Parameter naming](#parameter-naming)
     
-    1.3.3. [Contents](#Contents)
+    1.3.3. [Contents](#contents)
     
-    1.4. [Files](#Files)
+    1.4. [Files](#files)
     
-    1.4.1. [Imports](#Imports)
+    1.4.1. [Imports](#imports)
     
-    1.4.2. [Directories](#Directories)
+    1.4.2. [Directories](#directories)
     
     1.5. [Naming](#naming)
     
-    1.6. [Services](#Services)
+    1.6. [Services](#services)
     
-    1.6.1. [Class names](#Class-names)
+    1.6.1. [Class names](#class-names)
     
-    1.6.2. [Factory services](#Factory-services)
+    1.6.2. [Factory services](#factory-services)
     
-    1.6.3. [ID as FQCN (class name)](#ID-as-FQCN-(class-name))
+    1.6.3. [ID as FQCN (class name)](#id-as-fqcn-(class-name))
     
-    1.6.4. [Autoconfiguration and autowiring](#Autoconfiguration-and-autowiring)
+    1.6.4. [Autoconfiguration and autowiring](#autoconfiguration-and-autowiring)
     
-    1.7. [Routing](#Routing)
+    1.7. [Routing](#routing)
     
-    1.7.1. [Route prefix](#Route-prefix)
+    1.7.1. [Route prefix](#route-prefix)
     
-    1.7.2. [Route naming](#Route-naming)
+    1.7.2. [Route naming](#route-naming)
     
-    1.8. [Production configuration](#Production-configuration)
+    1.8. [Production configuration](#production-configuration)
     
-    1.9. [Always full service IDs](#Always-full-service-IDs)
+    1.9. [Always full service IDs](#always-full-service-ids)
     
-2. [Repositories](#Repositories)
+2. [Repositories](#repositories)
 
-    2.1. [Injection](#Injection)
+    2.1. [Injection](#injection)
     
-    2.2. [Configuration](#Configuration)
+    2.2. [Configuration](#configuration)
     
-    2.3. [Finding by ID](#Finding-by-ID)
+    2.3. [Finding by ID](#finding-by-id)
     
-    2.4. [Queries](#Queries)
+    2.4. [Queries](#queries)
     
-    2.5. [Return types](#Return-types)
+    2.5. [Return types](#return-types)
     
-    2.5.1. [Basic usage](#Basic-usage)
+    2.5.1. [Basic usage](#basic-usage)
     
-    2.5.2. [Advanced usage](#Advanced-usage)
+    2.5.2. [Advanced usage](#advanced-usage)
     
-    2.6. [Method naming](#Method-naming)
+    2.6. [Method naming](#method-naming)
     
-    2.7. [Only custom methods from outside of repository](#Only-custom-methods-from-outside-of-repository)
+    2.7. [Only custom methods from outside of repository](#only-custom-methods-from-outside-of-repository)
     
-    2.8. [Repositories from other bundles](#Repositories-from-other-bundles)
+    2.8. [Repositories from other bundles](#repositories-from-other-bundles)
     
-    2.9. [Prefetching and filtering at the same time](#Prefetching-and-filtering-at-the-same-time)
+    2.9. [Prefetching and filtering at the same time](#prefetching-and-filtering-at-the-same-time)
     
-    2.10. [Searching / paginating by date](#Searching-/-paginating-by-date)
+    2.10. [Searching / paginating by date](#searching-/-paginating-by-date)
     
-3. [Entities](#Entities)
+3. [Entities](#entities)
 
-    3.1. [Setters](#Setters)
+    3.1. [Setters](#setters)
     
-    3.2. [Setters vs adders](#Setters-vs-adders)
+    3.2. [Setters vs adders](#setters-vs-adders)
     
-    3.3. [Relations in setters](#Relations-in-setters)
+    3.3. [Relations in setters](#relations-in-setters)
     
-    3.4. [States, types etc.](#States,-types-etc.)
+    3.4. [States, types etc.](#states,-types-etc.)
     
-    3.5. [ID](#ID)
+    3.5. [ID](#iD)
     
-    3.6. [Creation date](#Creation-date)
+    3.6. [Creation date](#creation-date)
     
-    3.7. [Updated at](#Updated-at)
+    3.7. [Updated at](#updated-at)
     
-4. [Doctrine](#Doctrine)
+4. [Doctrine](#doctrine)
 
-    4.1. [Flush](#Flush)
+    4.1. [Flush](#flush)
     
-    4.1.1. [Number of flushes](#Number-of-flushes)
+    4.1.1. [Number of flushes](#number-of-flushes)
     
-    4.1.2. [Where to flush](#Where-to-flush)
+    4.1.2. [Where to flush](#where-to-flush)
     
-    4.1.3. [Multiple flushes](#Multiple-flushes)
+    4.1.3. [Multiple flushes](#multiple-flushes)
     
-    4.2. [Database types and definitions](#Database-types-and-definitions)
+    4.2. [Database types and definitions](#database-types-and-definitions)
     
-    4.3. [Database naming](#Database-naming)
+    4.3. [Database naming](#database-naming)
     
-    4.3.1. [Underscored](#Underscored)
+    4.3.1. [Underscored](#underscored)
     
-    4.3.2. [Plural](#Plural)
+    4.3.2. [Plural](#plural)
     
-    4.3.3. [Prefix](#Prefix)
+    4.3.3. [Prefix](#prefix)
     
-    4.3.4. [SQL keywords](#SQL-keywords)
+    4.3.4. [SQL keywords](#sql-keywords)
     
-    4.4. [Class-map](#Class-map)
+    4.4. [Class-map](#class-map)
     
-    4.5. [Extendability pattern instead of class-map](#Extendability-pattern-instead-of-class-map)
+    4.5. [Extendability pattern instead of class-map](#extendability-pattern-instead-of-class-map)
     
-    4.6. [Saving Money instances](#Saving-Money-instances)
+    4.6. [Saving Money instances](#saving-Money-instances)
     
-    4.6.1. [No getters for amount and currency](#No-getters-for-amount-and-currency)
+    4.6.1. [No getters for amount and currency](#no-getters-for-amount-and-currency)
     
-    4.6.2. [No handling with events](#No-handling-with-events)
+    4.6.2. [No handling with events](#no-handling-with-events)
     
-    4.6.3. [We do not store Money objects themselves](#We-do-not-store-Money-objects-themselves)
+    4.6.3. [We do not store Money objects themselves](#we-do-not-store-money-objects-themselves)
     
-    4.6.4. [We store amount as decimal](#We-store-amount-as-decimal)
+    4.6.4. [We store amount as decimal](#we-store-amount-as-decimal)
     
-    4.7. [Doctrine migrations](#Doctrine-migrations)
+    4.7. [Doctrine migrations](#doctrine-migrations)
     
-    4.8. [ID column strategy](#ID-column-strategy)
+    4.8. [ID column strategy](#id-column-strategy)
     
-    4.9. [Variable types for query parameters](#Variable-types-for-query-parameters)
+    4.9. [Variable types for query parameters](#variable-types-for-query-parameters)
     
-5. [Controllers](#Controllers)
+5. [Controllers](#controllers)
 
-    5.1. [As services](#As-services)
+    5.1. [As services](#as-services)
     
-    5.2. [Static templates](#Static-templates)
+    5.2. [Static templates](#static-templates)
     
-    5.3. [Parameters passed to view](#Parameters-passed-to-view)
+    5.3. [Parameters passed to view](#parameters-passed-to-view)
     
-    5.4. [Small controllers](#Small-controllers)
+    5.4. [Small controllers](#small-controllers)
     
-    5.5. [Class naming](#Class-naming)
+    5.5. [Class naming](#class-naming)
     
-6. [Events](#Events)
+6. [Events](#events)
 
-    6.1. [Available events](#Available-events)
+    6.1. [Available events](#available-events)
     
-    6.2. [Event naming](#Event-naming)
+    6.2. [Event naming](#event-naming)
     
-    6.3. [Listener naming](#Listener-naming)
+    6.3. [Listener naming](#listener-naming)
     
-    6.4. [Event class naming](#Event-class-naming)
+    6.4. [Event class naming](#event-class-naming)
     
-7. [Directory structure](#Directory-structure)
+7. [Directory structure](#directory-structure)
 
-    7.1. [Root bundle directory](#Root-bundle-directory)
+    7.1. [Root bundle directory](#root-bundle-directory)
     
-    7.2. [Basic directories for code](#Basic-directories-for-code)
+    7.2. [Basic directories for code](#basic-directories-for-code)
     
-    7.3. [Integration with other bundles](#Integration-with-other-bundles)
+    7.3. [Integration with other bundles](#integration-with-other-bundles)
     
-    7.4. [Special directories](#Special-directories)
+    7.4. [Special directories](#special-directories)
     
-    7.5. [Example](#Example)
+    7.5. [Example](#example)
     
-8. [Twig](#Twig)
+8. [Twig](#twig)
 
-    8.1. [Calling methods](#Calling-methods)
+    8.1. [Calling methods](#calling-methods)
     
-9. [Commands](#Commands)
+9. [Commands](#commands)
 
-    9.1. [Naming](#Naming)
+    9.1. [Naming](#naming)
     
-    9.2. [Dependencies](#Dependencies)
+    9.2. [Dependencies](#dependencies)
     
-10. [Symfony version and new projects](#Symfony-version-and-new-projects)
+10. [Symfony version and new projects](#symfony-version-and-new-projects)
 
-    10.1. [Version and structure](#Version-and-structure)
+    10.1. [Version and structure](#version-and-structure)
     
-    10.2. [Configuration](#Configuration)
+    10.2. [Configuration](#configuration)
     
 
 
