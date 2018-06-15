@@ -39,7 +39,7 @@ Paysera PHP style guide
       
     3.5 [IDE Warnings](#ide-warnings)
     
-4. [Main patterns](https://github.com/paysera/php-style-guide/tree/master/main-patterns)
+4. [Main patterns](#main-patterns)
 
     4.1 [Thin model](#thin-model)
     
@@ -55,8 +55,28 @@ Paysera PHP style guide
     
     4.7 [Services](#services)
 
-1. [REST in PHP](https://github.com/paysera/php-style-guide/tree/master/rest-in-php)
-1. [Smartweb related conventions](https://github.com/paysera/php-style-guide/tree/master/smartweb-related-conventions)
+5. [REST in PHP](#rest-in-php)
+    
+    5.1 [REST controllers](#rest-controllers)
+    
+    5.2 [Result providers](#result-providers)
+    
+    5.3 [Extending model](#extending-model)
+    
+    5.4 [Permissions](#permissions)
+    
+    5.5 [Pagination](#pagination)
+    
+6. [Smartweb related conventions](https://github.com/paysera/php-style-guide/tree/master/smartweb-related-conventions)
+    
+    6.1 [New features](#new-features)
+    
+    6.2 [External dependencies](#external-dependencies)
+    
+    6.3 [Database migrations](#database-migrations)
+    
+    6.4 [Bank integration](#bank-integration)
+    
 1. [Symfony related conventions](https://github.com/paysera/php-style-guide/tree/master/symfony-related-conventions)
 1. [Handling sensitive values](https://github.com/paysera/php-style-guide/tree/master/handling-sensitive-values)
 1. [Composer conventions](https://github.com/paysera/php-style-guide/tree/master/composer-conventions)
@@ -2175,3 +2195,171 @@ We do not use events to actually make some action happen, which is mandatory for
 
 We should not make assumptions about listeners of some event. If we require a result from event listeners, this indicates that we should refactor functionality and use interfaces with tags or some similar solution.
 
+# REST in PHP
+
+## REST controllers
+
+For REST controllers, we use [`PayseraRestBundle`](https://github.com/paysera/lib-rest-bundle) and normalizers.
+
+Controller methods return entities or scalar variables.
+
+Each method is configured with normalizer and denormalizer if needed.
+
+We do not use request object from the controller. We define normalizers to give only the needed information to the controller. We can use plain normalizer or plain item normalizer if needed.
+
+## Result providers
+
+We use result provider to give `Result` entities from REST controller.
+
+## Extending model
+
+In server side we do not use subclasses and class-maps - we use services that give or process needed information.
+
+On the client side, on the other hand, we have full model (via subclasses or just put into one class).
+
+On the server side:
+
+```php
+<?php
+class MainEntity
+{
+    protected $id;
+    protected $type;
+}
+
+class SubEntity
+{
+    protected $id;
+    protected $mainEntity;
+    protected $subValue;
+}
+
+class AnotherSubEntity
+{
+    protected $id;
+    protected $mainEntity;
+    protected $anotherSubValue;
+}
+```
+
+On the client side:
+
+```php
+<?php
+class Entity
+{
+    protected $id;
+    protected $type;
+    protected $subValue;
+    protected $anotherSubValue;
+}
+```
+
+OR
+
+```php
+<?php
+class Entity
+{
+    protected $id;
+}
+class SubEntity extends Entity
+{
+    protected $subValue;
+}
+class AnotherSubEntity extends Entity
+{
+    protected $anotherSubValue;
+}
+```
+
+## Permissions
+
+We always check permissions in REST controllers (access to resource) and/or listeners (access to API).
+
+We check permissions using `SecurityContext` and writing custom voters, which implement `VoterInterface`.
+
+## Pagination
+
+We prefer cursor-based pagination.
+
+# Smartweb related conventions
+
+## New features
+
+All new features are implemented as new Symfony bundles.
+
+## External dependencies
+
+### No hardcoded external dependencies
+
+When creating bundle, it must have clear dependencies. Bundle can depend only on components (Evp/Component namespace), vendors or other bundles (except SymfonyIntegrationBundle).
+
+SymfonyIntegrationBundle, on the other hand, can depend on any smartweb functionality.
+
+In other words, Edit → Find must return no results when searching in new bundle for `smartweb`, `Evp_`, `m_pay` etc.
+
+In other words, we must be able to get the bundle and move it to some other project/repository.
+
+### Interfaces
+
+If bundle need information about something available only in smartweb, Bundle defines an interface without any implementation and other services depend on this interface.
+
+This interface can be defined in some other bundle that this bundle depends on (for example, UserBundle).
+
+### Configuration
+
+We provide semantical configuration for this bundle via Configuration and Extension classes.
+
+In the configuration we take service ID, which implements our needed interface.
+
+We add alias in Extension class to provided service ID.
+
+```php
+evp_questionnaire:
+    user_provider: evp_smartweb_integration.user_provider
+```
+
+```php
+<?php
+$container->setAlias('evp_questionnaire.user_provider', $config['user_provider']);
+```
+
+```php
+<service id="evp_questionnaire.service" class="Service">
+    <argument type="service" id="evp_questionnaire.user_provider"/>
+</service>
+```
+
+```php
+<?php
+class Service
+{
+    public function __construct(UserProviderInterface $provider) {}
+}
+```
+
+```php
+<?php
+namespace Evp\Bundle\SmartwebIntegrationBundle;
+class UserProvider implements \Evp\Bundle\QuestionnaireBundle\UserProviderInterface
+{
+// ...
+}
+```
+
+## Database migrations
+
+We do not use update scripts for database migrations. We use doctrine migrations for that.
+
+## Bank integration
+
+### Bank naming
+
+Bank keys should begin with country code (when available), followed by underscore and bank name, eg.: "ee\_krediidi" or just "webmoney".
+
+Bank keys in app-mokejimai and in app-evpbank should be the same.
+
+### Accounting template naming
+
+Accounting template names are generated during payment with AccountingTemplateNameResolver::getAddPaymentBillTemplateName method. Use this method to verify and/or check if supplied accounting template name is correct, generated accounting template name should be available in database - "m\_bill\_templates" table, "TemplateTitle" and "Title" columns. A good practise is to append new data to AccountingTemplateNameResolverTest::nameResolutionDataProvider and use new test case to verify that new template name exists in database.
