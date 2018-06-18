@@ -77,10 +77,65 @@ Paysera PHP style guide
     
     6.4 [Bank integration](#bank-integration)
     
-1. [Symfony related conventions](https://github.com/paysera/php-style-guide/tree/master/symfony-related-conventions)
-1. [Handling sensitive values](https://github.com/paysera/php-style-guide/tree/master/handling-sensitive-values)
-1. [Composer conventions](https://github.com/paysera/php-style-guide/tree/master/composer-conventions)
-1. [Deprecated conventions](https://github.com/paysera/php-style-guide/tree/master/deprecated-conventions)
+7. [Symfony related conventions](#symfony-related-conventions)
+
+    7.1 [Configuration](#configuration)
+        
+    7.2 [Repositories](#repositories)
+        
+    7.3 [Entities](#entities)
+        
+    7.4 [Doctrine](#doctrine)
+        
+    7.5 [Controllers](#controllers)
+        
+    7.6 [Events](#events)
+        
+    7.7 [Directory structure](#directory-structure)
+        
+    7.8 [Twig](#twig)
+        
+    7.9 [Commands](#commands)
+        
+    7.10 [Symfony version and new projects](#symfony-version-and-new-projects)
+    
+8. [Handling sensitive values](#handling-sensitive-values)
+    
+    8.1 [Logging](#logging)
+    
+    8.2 [Passing sensitive values as arguments](#passing-sensitive-values-as-arguments)
+    
+    8.3 [Storing sensitive values in entities](#storing-sensitive-values-in-entities)
+    
+9. [Composer conventions](#composer-conventions)
+
+    9.1 [Semantic versioning](#semantic-versioning)
+    
+    9.2 [Backward incompatible changes](#backward-incompatible-changes)
+    
+    9.3 [Releases](#releases)
+    
+    9.4 [Reviewing tagging policy](#reviewing-tagging-policy)
+    
+    9.5 [Initial library development](#initial-library-development)
+    
+    9.6 [Constraints on library versions](#constraints-on-library-versions)
+    
+    9.7 [Constraints on vendors](#constraints-on-vendors)
+    
+    9.8 [Making minor/patch release on previous version](#making-minorpatch-release-on-previous-version)
+    
+10. [Deprecated conventions](#deprecated-conventions)
+    
+    10.1 [REST proxy controllers](#rest-proxy-controllers)
+    
+    10.2 [Splitting controllers by use-case (administration / frontend)](#splitting-controllers-by-use-case-(administration--frontend))
+    
+    10.3 [--force](#--force)
+    
+    10.4 [markAs*](#markas)
+    
+    10.5 [common libraries / bundles](#common-libraries--bundles)
 
 # PSR-1
 
@@ -2363,3 +2418,1154 @@ Bank keys in app-mokejimai and in app-evpbank should be the same.
 ### Accounting template naming
 
 Accounting template names are generated during payment with AccountingTemplateNameResolver::getAddPaymentBillTemplateName method. Use this method to verify and/or check if supplied accounting template name is correct, generated accounting template name should be available in database - "m\_bill\_templates" table, "TemplateTitle" and "Title" columns. A good practise is to append new data to AccountingTemplateNameResolverTest::nameResolutionDataProvider and use new test case to verify that new template name exists in database.
+
+# Symfony related conventions
+
+This page describes conventions related directly with Symfony framework and related components (Doctrine, Twig).
+
+It also includes some closely related conventions that can be used independently (for example in libraries).
+    
+## Configuration
+
+
+### Configuration inside bundles
+
+We use xml configuration inside bundles.
+
+> **Why not yaml?** We use xml, because it is explicit and has schema definition - many mistakes can be avoided. yaml has many different variations and does not include validation nor autocomplete.
+
+
+> **Why not annotations?** We don’t use annotations, as we want to leave configuration and logic separate. Moreover, class and object/service are not the same, this makes it difficult to configure few services for one class.
+
+### Configuration in app directory
+
+We use yaml configuration inside app directory for semantical configuration files.
+
+> **Why?** Configuration is semantical here and thus not very complex. Most of examples use only this format, it’s default for Symfony standard.
+
+
+We still use xml for service definitions inside app directory.
+
+### Parameters dist files
+
+#### File naming
+
+We use `{origName}.dist.{origExt}` name for distribution versions of parameters.
+
+> **Why?** Original extension is left the same so we can use all IDE features. It is configurable (or not important) so we **can** do that.
+
+
+#### Parameter naming
+
+We do not put bundle prefix to parameters that we only use outside the bundle, for example to configure `config.yml` file.
+
+Prefixed parameters with a bundle name are used inside the bundle, use them as they would be private to only that bundle.
+
+**Incorrect**:
+
+`config.yml`:
+
+```yaml
+evp_cool_feature:
+    parameter: %evp_cool_feature.parameter%
+    option: %evp_cool_feature.option%
+```
+
+`parameters.dist.yml`:
+
+```yaml
+evp_cool_feature.parameter: A
+evp_cool_feature.option: B
+```
+
+**Correct**:
+
+`config.yml`:
+
+```yaml
+evp_cool_feature:
+    parameter: %cool_feature_parameter%
+    option: %cool_feature_option%
+```
+
+`parameters.dist.yml`:
+
+```yaml
+cool_feature_parameter: A
+cool_feature_option: B
+```
+We can use some other naming, as long as it has no bundle prefix.
+
+**Why?**
+
+Because when using bundle prefix, we make assumptions about their usage inside the bundle itself. It would brake or have unintended effects in a case like this:
+
+```php
+// ...
+$definition->setArguments(array($config['parameter'], $config['option']));
+$container->setParameter('evp_cool_feature.parameter', 'ABC');	// here we have a problem - our parameter from parameters.yml unintentionally overwrites this parameter in the bundle
+// ...
+```
+
+In other words, we have prefixes to avoid parameter clashing, by using prefix in `config.yml` (or other bundles - that's the same), we can break things.
+
+#### Contents
+
+We use parameters for development environment.
+
+> **Why?** We cannot use production as this would be security issue. All developers can add default values and change them only if needed.
+
+
+We use value `pass` for default passwords in development environment.
+
+We use default domains in parameters - if everywhere configured the same, no changes in parameters would be needed.
+
+We remove `app-` prefix from repository name and add `.dev.docker` as top-level domain. For example `app-wallet-api` ⇒ `http://wallet-api.dev.docker/`
+
+### Files
+
+#### Imports
+
+When configuring services, we split definitions into separate files and import to main `services.xml` or `routing.xml` files. For example:
+
+```txt
+config/services/controllers.xml
+config/services/forms.xml
+config/services/repositories.xml
+config/services/normalizers.xml
+```
+
+We put routing prefix into `<import/>` directive.
+
+#### Directories
+
+We put files to subdirectory - `services/`, `routing/` etc.
+
+### Naming
+
+Service ID always begins with bundle identifier, like `evp_contextual_information`, followed by dot.
+
+If type of service is repository, controller, listener or normalizer, these are following parts:
+
+-   type of service, like `manager`, `repository`, `controller`
+-   name of the service, excluding the type.
+
+If service is a manager, registry or some other unique service for that bundle, we use it’s identifier directly without the type.
+
+Valid service names: `evp_page.page_manager`, `evp_page.repository.page`
+
+### Services
+
+#### Class names
+
+We explicitly state class names for our services, we do not put them in separate parameters.
+
+Instead of this:
+
+```xml
+<parameter key="bundle.service.class">Namespace\ClassName</parameter>
+
+<service id="..." class="%bundle.service.class%"/>
+```
+
+we use this:
+
+```xml
+<service id="..." class="Namespace\ClassName"/>
+```
+
+> **Why?** This makes unnecessary difficulty when understanding available services and their structure. If we need to overwrite service, we overwrite it by it's ID, so we could change not only the class name, but also constructor arguments or make additional method calls. If functionality is to be changed by circumstances, we should make ability to change this service using bundle semantic configuration.
+
+
+#### Factory services
+
+We use new syntax for defining factory services:
+
+```xml
+<service id="newsletter_manager" class="NewsletterManager">
+    <factory class="NewsletterManagerFactory" method="createNewsletterManager"/>
+</service>
+```
+
+#### ID as FQCN (class name)
+
+We do not use service IDs as class names by default.
+
+> **Why?** As this allows easier configuration in some cases and avoids naming concerns for our services, it could be hard to refactor code when another service for the same class is added to our project. This would make one of the services "default" one, which would make debugging harder and understanding of internal working more difficult.
+
+> For example, if we have `BalanceProvider` and we would add another service for providing balance with debts included (using same class with different configuration), this would require to go over every usage of the first service and changing it's ID.
+
+We can use class name as service ID (or alias it) when we are providing open-source bundle. This allows others to use autowiring features if needed, even if we don't use them. We should only use this for public services - ones that are to be used outside of our bundle.
+
+#### Autoconfiguration and autowiring
+
+We don't use autowiring and autoconfiguration features of Dependency Injection component.
+
+> **Why?** First of all, we don't use FQCN as service IDs, so this would not work. Secondly, it might be quicker at the beginning to use it, but to understand the code, we would need to guess where the service really comes from. If we would need to refactor something, it might require to write DI configuration for already (automatically) defined services, too.
+
+### Routing
+
+#### Route prefix
+
+We always use bundle name as route prefix, just like in services. We leave out vendor prefix.
+
+Exception: we drop out `-common` suffix, if one exists. Routes should not clash with corresponding bundle without `-common`.
+
+#### Route naming
+
+We try to use names to identify the action taken by route, not methods to take it.
+
+For example, `create_page` instead of `page_post`.
+
+### Production configuration
+
+We do not put specific configuration in bundles - we provide semantic configuration for those and define them inside `app/config.yml`.
+
+We do not put secret parts of production configuration anywhere in repository - no private key files, common secret strings, passwords etc. They must be ignored by git and provided in `parameters.yml`, shared directory or in some other way.
+
+### Always full service IDs
+
+We never dynamically build parameter names or service IDs. We use tags if we need abtraction. We define map or state all things explicitly if needed.
+
+Do not do this:
+
+```php
+$container->get('my_prefix.' . $type . '.provider');
+```
+
+> **Why?** Because this is magic, not some nice pattern. It's hard to find all possible services which are registered (so hard to refactor - many potential pitfalls), we do not control if service is even registered in container, we cannot add some other configuration, we do not test if service implements some specific interface, we cannot get all possible types available or all possible services.
+
+
+Instead do this:
+
+```php
+public function addProvider(SomeInterface $provider, $type)
+{
+    $this->providers[$type] = $provider;
+}
+
+public function getProvider($type)
+{
+    // todo: throw if missing or return null
+    return $this->providers[$type];
+}
+
+// ...
+
+public function build(ContainerBuilder $container)
+{
+    $container->addCompilerPass(new AddTaggedCompilerPass(
+        'my_prefix.my_registry',
+        'my_prefix.tag_name',
+        'addProvider',
+        ['type']
+    ));
+}
+
+// ...
+
+$someRegistry->getProvider($type);
+```
+
+And tag services:
+
+```xml
+<service class="..." id="...">
+    <tag name="my_prefix.tag_name" type="my_awesome_provider"/>
+    <!-- arguments etc. -->
+</service>
+```
+
+## Repositories
+
+### Injection
+
+We inject repository objects inside the services via constructor.
+
+Thus, we do not use `EntityManager::getRepository` in controllers or services.
+
+### Configuration
+
+We configure repository classes with `lazy=true`.
+
+### Finding by ID
+
+For finding entity by ID we always use `find` method, not `findOneById` etc.
+
+Exception: If we want to preload some related entities.
+
+Another exception: If we override `findOneById` to contain call to `find`. This could be used to provide PhpDoc for IDE to guess the type returned.
+
+### Queries
+
+We use query builder and queries inside repositories only - we don’t build queries inside controllers or other services.
+
+### Return types
+
+#### Basic usage
+
+Repository methods starting with `find` returns instance(-s) of the class, that this repository is related to, or scalar values.
+
+#### Advanced usage
+
+If repository must use entity from other bundle, that this bundle does not depend upon, we make separate service in Repository namespace and write query in this service. For example:
+
+-   PosBundle has entity Spot. This bundle has extension points and does not depend on WorapayBundle.
+
+-   WorapayBundle has entity WorapaySpot. This entity has relation one-to-one with the Spot entity with no reverse relation (Spot does not know about WorapaySpot).
+
+-   We need method findSpotsByWorapayIdentifier(\$identifier). It returns Spot[], so should be in SpotRepository. But as it’s in SpotBundle, which does not depend on WorapayBundle, we make new service WorapayBundle/Repository/SpotRepository, inject base SpotRepository and build corresponding query there. In this case, we would need 2 from clauses as join would not work (no relation from Spot to WorapaySpot).
+
+### Method naming
+
+We use `findOneBy*` to find one object and `findBy*` to find list of objects.
+
+We use `getQueryBuilderFor*` to get query builders (for example for pagination), `findCountBy*` etc. to get scalar results.
+
+### Only custom methods from outside of repository
+
+We do not use `findOneBy` or `findBy` methods from outside of repository. We create method inside repository for that use-case - in that method, we can call `$this->findBy(...)` with given parameters.
+
+> **Why?** This allows to add more constraints in one single place, for example after adding `deleted` column we can update all queries inside repository to filter those records out by default. Also we can see all possible queries in one place - this allows to easier review which indexes should be defined and which are unused.
+
+
+### Repositories from other bundles
+
+We try to inject repositories only into services that are in the same bundle the repository is.
+
+If we need to get information from another bundle, we try to use services (which, in that bundle, can inject that repository).
+
+> **Why?** This creates proxy service for getting needed information. Even if at first it would only pass method call to repository itself, if something changes we can refactor it easier - we can inject other services, handle filtering of arguments or results etc. This helps a lot if method in repository is used from many many places inside whole project and we need to change some logic with other injected service.
+
+
+### Prefetching and filtering at the same time
+
+We do not select related entities if we filter by them. For example, do **not** do this:
+
+```php
+return $this->createQueryBuilder('c')
+    ->select('c, a')
+    ->leftJoin('c.accounts', 'a')
+    ->where('a.type = :accountType')
+    ->setParameters(array(
+        'accountType' => 'technical',
+    ))
+    ->getQuery()
+    ->getResult()
+;
+```
+
+Because if we iterate over client entities that were returned, and call `getAccounts()` on them, we will **not** get all accounts for that client. We will get only those that matched the query (technical accounts in this case). Furthermore, it breaks code such as this later in the process:
+
+```php
+$client = $clientRepository->find(123);
+$client->getAccounts();  // this will also return *only* technical accounts, as the client is cached in doctrine's identity map
+```
+
+What are the options?
+
+1) change `->select('c, a')` to `->select('c')`, so we do not pre-fetch accounts;
+2) pre-fetch them with a separate join:
+
+```php
+return $this->createQueryBuilder('c')
+    ->select('c, a')
+    ->leftJoin('c.accounts', 'a')
+    ->leftJoin('c.accounts', 'at')
+    ->where('at.type = :accountType')
+    ->setParameters(array(
+        'accountType' => 'technical',
+    ))
+    ->getQuery()
+    ->getResult()
+;
+```
+
+Keep in mind that pre-fetching is OK and recommended in most of the cases where we will use those relations. It's just not right if we also filter by that relation.
+
+
+### Searching / paginating by date
+
+When searching by date period, we take beginning inclusively and ending exclusively.
+
+> **Why?** We do not need to add or remove one second from time periods, code gets much more readable. If both would be inclusive or exclusive, when iterating through periods, some results would be provided in both periods and some results on no periods.
+
+
+On the other hand, in the user interface, if user wants to set dates inclusively, frontend logic has to map between UI and backend/API convention.
+
+
+## Entities
+
+
+### Setters
+
+All setters in entity returns `$this` for fluent interface.
+
+### Setters vs adders
+
+Setters always resets the previous value. Adders leaves previous value and only adds provided to already existing collection.
+
+### Relations in setters
+
+In many-to-one relation, `many` side (the owning one) always fixes relations. This is done in the `add*` method, adding reverse relation to `$this`.
+
+In this case `set*` contains code to reset collection and `add*` every item in provided collection, so that 1) every item in collection would have relation fixed 2) collection object would be the same as before `set*`
+
+```php
+<?php
+class Tree
+{
+    private $leaves;
+
+    public function __construct()
+    {
+        $this->leaves = new ArrayCollection();
+    }
+
+    /**
+     * @param Leaf[] $leaves we do not typecast to array or Collection as this can be any iterable
+     */
+    public function setLeaves($leaves)
+    {
+        $this->leaves->clear();
+        foreach ($leaves as $leaf) {
+            $this->addLeaf($leaf);
+        }
+        return $this;
+    }
+
+    public function addLeaf(Leaf $leaf)
+    {
+        $this->leaves[] = $leaf;
+        $leaf->setTree($this);
+        return $this;
+    }
+}
+```
+
+### States, types etc.
+
+We save states, types and other choice-type information as strings in database.
+
+We provide constants with possible property values in Entity.
+
+Constant name starts with property name, followed by the value itself.
+
+```php
+<?php
+class Entity
+{
+    const TYPE_SIMPLE = 'simple';
+    const TYPE_COMPLICATED = 'complicated';
+
+    private $type = self::TYPE_SIMPLE;
+}
+```
+
+### ID
+
+We do not provide `setId` method as we must not use it - we either persist new entity or take it from repository and update it.
+
+### Creation date
+
+We set `createdAt` property in constructor if we need creation date. We can also set `createdAt` in manager if entity is always created in that one place (it should be).
+
+> **Why not doctrine extension?** This works faster and more reliable. Furthermore, even new not-yet-persisted entities has `createdAt` value, so we can assert that it’s always available. Also this makes unit testing easier as we do not need to mock extensions.
+
+
+### Updated at
+
+We do not put `updatedAt` to entities unless needed. Valid use-case is if we need to see when **any** of the fields was changed, for example if synchronizing relational database via cron job into some other storage etc.
+
+In any other use-case `updatedAt` does not give needed information. Either it is not used at all, either it is used where it shouldn't. For example, if we need to see when some state has changed, we need to put extra column or even one-to-many relation to be sure that the date saved really represents that state change, not some other change in any other of entity fields. Even if there is one (besides `id` and `updatedAt`) field in entity, extra one can be added later and this would break the functionality (or naming).
+
+## Doctrine
+
+### Flush
+
+#### Number of flushes
+
+We always avoid more than one `flush` in one process.
+
+#### Where to flush
+
+We use `flush` only in controllers, commands and workers. These are the top input layer to the system, and is used usually only once per request life-cycle. Services (and especially listeners) can be used in many different ways, so we cannot make assumption that a few of them will not get called in the same request.
+
+#### Multiple flushes
+
+Services that do flush the database or use other services that flush the database (in any depth) should not live in namespace Service/, but in separate namespaces such as Processor/.
+
+```php
+<?php
+
+// namespace Evp\Bundle\AccountingBundle\Service; // Incorrect
+namespace Evp\Bundle\AccountingBundle\Processor; // Correct
+
+use Doctrine\ORM\EntityManagerInterface;
+
+class FooProcessor
+{
+    protected $entityManager;
+    protected $remoteServiceClient;
+
+    public function __construct(EntityManagerInterface $entityManager, RemoteServiceClient $remoteServiceClient)
+    {
+        $this->entityManager = $entityManager;
+    }
+
+    public function process()
+    {
+        $foo = new Foo('name');
+        $createdFoo = $this->remoteServiceClient->createFoo($foo);
+        $foo->setRemoteId($createdFoo['id']);
+        $this->entityManager->flush();
+
+        $this->remoteServiceClient->confirmFoo($foo);
+        $foo->setStatus('done');
+        $this->entityManager->flush();
+    }
+}
+```
+
+### Database types and definitions
+
+When we use Doctrine `string` type, we use length of `255` or bigger if needed.
+
+> **Why?** There is no real advantage in using less than `255`. It does not add performance, does not save space and can only cause difficulties if some smaller defined max length is reached.
+
+
+### Database naming
+
+#### Underscored
+
+We use underscored names for both table names and column names.
+
+#### Plural
+
+We use plural nouns as table names.
+
+> **Why?** This makes SQL statements more natural language - we select some items from a collection.
+
+
+#### Prefix
+
+We add prefix to all databases, consisting of bundle name without vendor. `EvpPageBundle:PageRoute` -> `page_page_routes`.
+
+#### SQL keywords
+
+We avoid SQL keywords in table and column names, but leave them as is in PHP-side.
+
+```php
+<?php
+class Entity
+{
+    private $key;
+}
+```
+
+```xml
+<field name="key" column="entity_key" type="string"/>
+```
+
+### Class-map
+
+We avoid Doctrine class-map and extending entities.
+
+> **Why?** Extending comes with very bad performance (many relations are queried automatically even if they are never used afterwards), and many intanceof checks in the code. Also, this is not extendable, as base bundle must know about all others extending it’s entity. Moreover, we cannot change instance of Entity (change it's subclass) once it's created, which also makes things unnecessarily difficult.
+
+
+### Extendability pattern instead of class-map
+
+We use such a pattern:
+
+-   Base entity has only the information, which is common to all entities. Thus this information is used inside base bundle in some services.
+
+-   Base entity has field type, providerKey or similar. It defines, which bundle/manager/provider created this entity and knows more information.
+
+-   There is Manager or similar service in base bundle, which provides methods to manage this entity (and it’s subclasses). This service has method addProvider or similar, accepting ProviderInterface (or similar)
+
+-   There is a compiler pass, which adds Providers (etc., implementing interface from base bundle) to Manager via add\* method. We can always use the same class from lib-dependency-injection repository, no need to create separate for each case, only if there is some custom logic.
+
+-   Providers live in their bundles, optionally having additional information in some separate entities, which possibly have relation to the base entity.
+
+Example:
+
+-   PageBundle has entity Block, which has id and providerKey.
+
+-   BlockManager has method renderBlock(Block \$block) and addProvider(ProviderInterface \$provider). It lives in PageBundle. Methods from ProviderInterface are used only in this manager, (bad: manager→getProvider(block)→render(block), good: manager→render(block)). This allows to refactor some of the code more easily if needed.
+
+-   There is compiler pass registered, which adds all tagged providers to manager via addProvider method.
+
+-   ProviderInterface lives in PageBundle and has 2 methods: getKey() and renderBlock(Block \$block)
+
+-   SmartwebIntegrationBundle has Entity SmartwebPageBlock, which has fields block and pageId.
+
+-   SmartwebBlockProvider implements ProviderInterface and lives in SmartwebIntegrationBundle. renderBlock method searches for SmartwebPageBlock related to the given block and renders page via pageId.
+
+Such structure let’s extend services without reverse dependencies. As base bundle has no dependencies, it can be moved to separate bundles. Also the code is not changed in the base bundle - we can only test the new providers etc., no need to test if we didn’t brake anything in the base bundle.
+
+### Saving Money instances
+
+#### No getters for amount and currency
+
+We only provide getter and setter for Money object, not for it's fields
+
+#### No handling with events
+
+We convert to and from Money object only in getters and setters, we do not use eventing system for that. It could lead to unsaved fields, as doctrine does not watch object property, it only watches amount and currency properties, so in some cases there can be no event at all. Also this would make understanding structure, debugging and testing harder.
+
+#### We do not store Money objects themselves
+
+As money object is 1) immutable 2) never compared by reference, we do not store the object itself in Entity. We store only it's internal fields and recreate it when needed. This makes code simpler.
+
+```php
+class Entity
+{
+    private $priceAmount;
+    private $priceCurrency;
+
+    /**
+     * @var Money|null $price
+     */
+    public function setPrice(Money $price = null)
+    {
+        if ($price === null) {
+            $this->priceAmount = null;
+            $this->priceCurrency = null;
+        } else {
+            $this->priceAmount = $price->getAmount();
+            $this->priceCurrency = $price->getCurrency();
+        }
+    }
+
+    public function getPrice()
+    {
+        return $this->priceAmount !== null && $this->priceCurrency !== null ? new Money($this->priceAmount, $this->priceCurrency) : null;
+    }
+}
+```
+
+#### We store amount as decimal
+
+Inside doctrine configuration:
+
+```xml
+<field name="amount" type="decimal" precision="16" scale="6" />
+```
+
+This allows to sum and perform other number-based operations inside the database. Also, it auto-validates amount to be numeric (just in case we didn't handle it), and it takes less space, so also performs better if indexing.
+
+We store currency as a string.
+
+### Doctrine migrations
+
+For migrating database structure we always use doctrine migrations. There should be no changes inside generated migration if we run `doctrine:migrations:diff` after `doctrine:migrations:migrate`. We do not put custom `ALTER` or `CREATE` statements inside migration scripts ourselves - we modify `xml` file and let doctrine to generate migration file for us.
+
+If needed, we can add additional `UPDATE` or/and `INSERT` statements for data migration corresponding to our new database structure.
+
+For new projects, we do not put `CREATE DATABASE` into migration scripts, but all tables should be created and then altered by doctrine migrations.
+
+### ID column strategy
+
+We use `IDENTITY` strategy for ID generation. This makes different structure in PostgreSQL - it works in same way as in MySQL. If we use `AUTO`, sequence is used and ID is set as soon as we persist the entity. As this behavior is not reproducible in MySQL database, we use `IDENTITY` to be compatible with more databases. This also affects functional tests as sqlite does not have sequences, too.
+
+Example configuration:
+
+```xml
+<id name="id" type="integer">
+    <generator strategy="IDENTITY"/>
+</id>
+```
+
+### Variable types for query parameters
+
+Always make sure that parameters are of correct type when building query.
+
+This is especially important when we pass an integer and column type is `VARCHAR`. In this case database tries to cast column value of every row into an integer and compare to passed value - no indexes get used in such cases. For example:
+
+```sql
+SELECT * FROM gateway.ext_log_entries e0_
+WHERE e0_.object_id = 21590
+      AND e0_.object_class = 'Evp\\Bundle\\ClientBundle\\Entity\\ClientNatural'
+ORDER BY e0_.version DESC;
+```
+
+Correct usage:
+
+```sql
+SELECT * FROM gateway.ext_log_entries e0_
+WHERE e0_.object_id = '21590'
+      AND e0_.object_class = 'Evp\\Bundle\\ClientBundle\\Entity\\ClientNatural'
+ORDER BY e0_.version DESC;
+```
+
+For PHP7, we might require that correct type (`string` in this case) would be passed as an argument. For lower PHP versions, we could cast an argument when passing to query.
+
+## Controllers
+
+### As services
+
+We use controllers as a services. That is, every controller must be defined as a service.
+
+If controller methods returns Response objects (that is this is not REST controller), controller can extend base Symfony Controller. In this case we add a call to setContainer in controller definition (services/controllers.xml). We do not use container in the controller’s code - we inject needed services via constructor.
+
+### Static templates
+
+If controller has no logic, we use `FrameworkBundle:Template:template` controller in routing and set `template` argument to twig template name to render.
+
+### Parameters passed to view
+
+We pass original representation of variables to view, if view can itself transform the variables.
+
+```php
+<?php
+class Controller
+{
+    public function action()
+    {
+        // ...
+        return $this->render($template, array(
+            'options' => array('a' => $a, 'b' => $b), // we do not use json_encode() here
+        ));
+    }
+}
+```
+
+```php
+<div data-options="{{ options|json_encode }}"></div>
+```
+
+> **Why?** Controller just provides variables, it does not know (or shouldn’t know) how they will be used in template. Furthermore, template sometimes needs both encoded and original versions, so controller would duplicate some code in such case.
+
+
+### Small controllers
+
+We group actions into small controllers - we do not put more than 5-8 actions into one controller.
+
+We try to make controller for each of resources, not just one for whole bundle.
+
+It’s perfectly ok to have controllers containing only one action (such controllers can be easily configured and reused).
+
+> **Why?** As we use constructor injection, big controllers have many dependencies, which are rarely used in such cases. This is bad for performance.
+
+
+### Class naming
+
+Controller class name must always end with `Controller`.
+
+## Events
+
+### Available events
+
+We put all available events in `final` class, containing only constants with available events.
+
+### Event naming
+
+We name events in past-tense verbs, prefixed by resource for which some action happened.
+
+> **Why?** Events should be used only after something happened (exception: before something happening). Present tense verb would indicate that event should make something, which would be a misuse of event system.
+
+
+We do not start constants with `ON_`.
+
+> **Why?** `on*` indicates action performed when event is dispatched, not the event itself.
+
+
+We can start constants with `BEFORE_` or `AFTER_` if it indicated event that is dispatched before or after some action.
+
+We give constant the same value as the constant name, prefixed with bundle name.
+
+> **Why?** For find-replace to find both constant and it’s value usage (in tags). Bundle prefix is needed to avoid collisions.
+
+
+```php
+<?php
+final class PageEvents
+{
+    const PAGE_CREATED = 'evp_page.page_created';
+}
+```
+
+### Listener naming
+
+We use `on*`, `before*` or `after*` method names for event listeners.
+
+We can use the same method for several events if logic is the same.
+
+### Event class naming
+
+We name event classes by their data, not some concrete use case.
+
+Wrong:
+
+```php
+<?php
+class PageCreatedEvent extends Event
+{
+    private $page;
+}
+```
+
+Correct:
+
+```php
+<?php
+class PageEvent extends Event
+{
+    private $page;
+}
+```
+
+Also correct:
+
+```php
+<?php
+class PageChangedEvent extends Event
+{
+    private $page;
+    private $previousPage;
+}
+```
+
+## Directory structure
+
+### Root bundle directory
+
+We put following classes to root bundle directory:
+
+-   Bundle definition
+-   Final Events classes for events, raised by this bundle
+
+### Basic directories for code
+
+-   `Command` - for commands
+-   `Controller` - for controllers
+-   `Entity` - for entities
+-   `Event` - for events
+-   `Listener` - for listeners
+-   `Normalizer` - for normalizers
+-   `Repository` - for repositories
+-   `Service` - for main services of this bundle
+-   `Worker` - for workers (handles jobs from RabbitMQ)
+
+### Integration with other bundles
+
+We use custom namespaces for integrating with other bundles or when our service has some specific type, is not main facade for that bundle.
+
+```txt
+Callback/CallbackValidator.php
+Callback/CallbackProvider.php
+DynamicAsset/AssetGroupProvider.php
+PageBlock/MenuProvider.php
+```
+
+### Special directories
+
+-   `Resources` - for resources
+-   `Tests` - for tests. Test for `Vendor/Bundle/SomeBundle/Namespace/Service` goes to `Vendor/Bundle/SomeBundle/Tests/Namespace/ServiceTest`
+
+### Example
+
+```txt
+Evp/Bundle/PageBundle
+    Controller
+        PageController.php
+        PageApiController.php
+    DynamicAsset
+        AssetGroupProvider.php
+    Entity
+        Page.php
+        Block.php
+    Event
+        PageEvent.php
+    Listener
+        LocaleListener.php
+        RequestSubscriber.php
+    Menu
+        PageMenuProvider.php
+    Normalizer
+        BlockNormalizer.php
+        PageNormalizer.php
+    Resources
+        ...
+    Service
+        PageManager.php
+        BlockProviderInterface.php
+        BlockManager.php
+    Tests
+        Menu
+            PageMenuProviderTest.php
+        Service
+            PageManagerTest.php
+    PageEvents.php
+    EvpPageBundle.php
+```
+
+## Twig
+
+### Calling methods
+
+We use either `.something` or `.getSomething()`, we do not use `.getSomething`.
+
+We prefer `.something` for getters without arguments.
+
+We prefer using static templates with JS framework and REST API over twig.
+
+## Commands
+
+### Naming
+
+If command name consists of several words, we use dashes to separate them. For example, `some-namespace:do-something`
+
+### Dependencies
+
+If project uses Sf 2.4 and above, we register commands as services with dependencies injected into them.
+
+For Sf 2.3 we take dependencies from service container.
+
+## Symfony version and new projects
+
+### Version and structure
+
+We use only stable releases for our projects.
+
+We use only supported (at least for security fixes) versions of Symfony.
+
+We prefer LTS version of Symfony framework as it does not require much maintenance on updating vendors.
+
+We can use, if applicable, newer stable version of Symfony, but we must update it periodically (more often than LTS) so that is would still be supported (even if we don't actively maintain that project, so choose carefully).
+
+We prefer to use only 2 different major versions of Symfony for our projects. For example:
+
+* let's say that currently Symfony 3.4 is newest LTS version of Symfony. Symfony 4.1 is stable, but not LTS version. Symfony 2.8 is older LTS version and is still supported;
+* some projects are still ran on Symfony 2.8 version;
+* we are migrating these projects to Symfony 3.4, some projects are already using it;
+* we avoid using Symfony 4.1 for new projects (or avoid updating current projects to this version) as this would make 3 different major versions in use;
+* when all the projects are updated to Symfony 3.4, we could update our project to use Symfony 4.1 (even non-LTS) or use this for new projects.
+
+> **Why not using 3 different major versions?** This would make quite hard to maintain several Symfony versions in our libraries and bundles. If we would drop 2.x support (to support only 3.x and 4.x), this would make difficult to correct some bug or add improvement to those projects that still use 2.x version.
+
+
+### Configuration
+
+We always use skeleton to bootstrap new projects as this allows to easily use any (configuration) fixes or improvements that were made to each and every project during the years. It also includes all needed basic features that could be depended on by our libraries or bundles which could be installed afterwards.
+
+Keep in mind that there are different skeletons for WEB, REST API and processing nodes.
+
+# Handling sensitive values
+
+Sensitive values are those that are secret and should not be known or read in plain text. For example passwords, tokens, secret generated codes etc. Any values that can affect security of the system.
+
+## Logging
+
+We never log content where sensitive values can be found. For example, request content for all requests, as these include call to authentication. We must either 1) do not log at all 2) make whitelist what to log 3) make blacklist when to avoid logging (this is not recommended as can be easily forgotten).
+
+When we configure loggers, we always use normalizers that does not extract private fields from any given objects by default.
+
+## Passing sensitive values as arguments
+
+As we log exception stack trace, any scalar values passed as arguments can be used in stack trace. To avoid that, we put sensitive values to `SensitiveValue` object as soon as they enter our system. We pass them as this object. We get the value itself only in lowest level possible.
+
+If we cannot pass `SensitiveValue` (for example, to vendor library), we catch `\Exception` and re-throw a new one, without providing last exception from before (we can copy the message itself, if it does not contain sensitive values).
+
+## Storing sensitive values in entities
+
+If we really need to store sensitive value in an entity, we make that property private. We also make that setter and getter would operate with `SensitiveValue` and not scalar type itself.
+
+Better approach is to always use hash of sensitive values, if we just need to check if provided value matches it. If we need to resend generated code or use original value later, only in that case we save code in database unchanged.
+
+# Composer Conventions
+
+## Semantic versioning
+
+We always use semantic versioning on library repositories.
+
+> **Why?** When backward incompatible change is made in library, we have two options: 1) update all client side projects with new library version 2) every time when we update library check for previous backward incompatible changes, not related to currently added feature. As it happens, sometimes none of these 2 takes place.
+
+## Backward incompatible changes
+
+If we make backward incompatible change, we always provide some basic information about what was changed in `CHANGELOG.md` or `UPGRADE.md` file.
+
+## Releases
+
+We tag each and every commit (except instant bug-fixes or commits before separate merge commits).
+
+1. Right before tagging, we make sure we're on master branch and always run `git tag --sort=v:refname` to see current tags.
+2. Before tagging, we see available branches on repository as version can be created by branch alias, not only by tags.
+3. We bump MAJOR, MINOR or PATCH version by one from latest version available (or parent commit if there are few active branches).
+
+    3.1. If we make backward incompatible change, we bump the MAJOR version.
+
+    3.2. If we add new feature (any new arguments, method calls, classes etc.), we bump MINOR version.
+
+    3.3. If we do not change API of library in any way, just change the internals (usually bug-fixes), we bump PATCH version.
+
+We use annotated tags so that time and author would be present. Example command, `1.2.3` taken as example tag:
+
+```
+git tag -a -m "" 1.2.3
+```
+
+`-m ""` sets message to the tag, but as all commits are already with messages, we can leave it empty.
+ 
+After tagging we need to call `git push origin (tag)` - this pushes our tags to origin. We only do this after we've landed our changes.
+ 
+After pushing, we need to manually update library in toran: go to toran, select "Private repositories", find yours and press "Update".
+
+## Reviewing tagging policy
+
+In differential revision we always comment on intended tagging policy - `MAJOR`, `MINOR` or `PATCH`. As this can change (wrong initial policy denied by review or changed after additional commits in review), we provide this information in a summary or in a comment, not in commit message (title of revision).
+
+Reviewer must reject a diff, if `MAJOR` bump is needed and no information is provided about backward incompatible changes.
+
+## Initial library development
+
+Until library is stable, versions can change quite often. In this case we still use tags and semantic versioning, but use `0` as MAJOR version. In this case any backward incompatible change can be made in any MINOR version bump. If API of library is quite stable and is not to change much, we use `1` as a MAJOR version initially.
+
+## Constraints on library versions
+
+We use as generic constraints as possible for required libraries. This avoids updating some library graph just because of some conservative constraint, and not because it is really needed.
+
+For example, we have `lib-a@1.0.0` and `lib-b@1.0.0`, which depends on `lib-a: ^1.0`. If we roll out MAJOR release for `lib-a` (aka `lib-a@2.0.0`), at some time we need to modify constraint on `lib-b`:
+
+1. If `lib-b` works with both `lib-a@1.0.0` and `lib-a@2.0.0` (change did not affect this library), we use `lib-a: >=1.0.0,<3.0`. This allows to use both `1.0` and `2.0` with our new version of `lib-b`.
+2. If `lib-b` works only with `lib-a@2.0.0` and not with `lib-a@1.0.0`, we modify constraint as usual to `lib-a: ^2.0.0`.
+3. If `lib-b` does not work with `lib-a@2.0.0`, we can either leave constraint to `^1.0` or update code and use (1) or (2) depending on compatibility with `1.0` version. Latter is recommended, as this allows to use newest possible versions (sooner or later we will need to update them).
+
+Version in `lib-b` in any of these cases is not required to make a MAJOR bump - if API of `lib-b` is left the same, we can make PATCH update. We can even entirely drop out `lib-a` and use some alternative library, as long as API leaves the same.
+
+This means that if `app-x` (or any other library) uses functions or classes from `lib-a`, it must require it in `composer.json`. If it just depends on `lib-b`, it does not care about `lib-a` versions or even if it is installed at all.
+
+## Constraints on vendors
+
+If we require vendor library, we use constraint depending on versioning strategy of that library. If it states, that it follows semantic versioning (and we believe it does), we use something like `^1.2.3` - this is added by default if we run `composer require vendor/library`. If it has some other strategy, we must correct the constraint so that we would not get unexpected backward incompatible changes. For example, Symfony components did break compatibility on minor releases (at least in 2.X ones). In that case, we must not use `^` in constraint.
+
+Basically, we must always assume that `composer update` can be run at any time and everything should still work as expected.
+
+Due to the same reason, we never require `dev-master`. If vendor library has no versions defined, we require specific commit:
+
+```
+"vendor/package": "dev-master#8e45af93e4dc39c22effdc4cd6e5529e25c31735"
+```
+ 
+## Making minor/patch release on previous version
+ 
+Usually we try to have single branch in origin. This way we only add features to the latest code and upgrade our software to use the newest versions of our libraries.
+ 
+In some cases, it might be needed to update/change code in some previous version of the library.
+ 
+Let's say, that library has versions 1.0, 2.0, 3.0, 3.1. We need to add change to 1.0 and make 1.1 version. In that case:
+ 
+1. Checkout tag we want to change (1.0 in example). Command: `git checkout tags/<tag_name> -b <branch_name>`
+2. Allow Dangerous changes for that library in Phabricator
+3. Push immediately with no changes to create new branch. Command: `git push --set-upstream <remote-name> <local-branch-name>`. Remote name should be `1.x` or `v1` in this example.
+4. Make changes, arc diff...
+5. Add git tag
+ 
+This creates additional branch so we can add fixes / new features and release 1.1 without changing 3.x versions.
+
+# Deprecated conventions
+
+Some convetions that are used thoughout the systems, either explicitly defined in conventions, either just used from practive, are deprecated.
+
+This page lists those conventions and reasons why we should avoid them.
+
+## REST proxy controllers
+
+Example:
+```
+Browser --(request with cookie)--> FrontendApiController --(request with header)--> BackendApiController --(SQL)--> DB
+```
+
+There was architecture decision made, that, for security reasons, we should make separate systems that are accessible from the Internet and those that can access the Internet themselves. Furthermore, APIs were splitted into backend-API (accessible only from our internal systems), public-API (accessible for users) and admin-API (accessible for administrators).
+
+In some cases, to migrate to this architecture, there were (still are) several different bundles in the same system, which, later on, could be separated into several different systems. Thus, even if system itself can access some functionality directly, it makes HTTP request to the same system (just a different endpoint). This makes lots of issues:
+
+- there were no clear way to guarantee that separation really works. In some cases frontend-API bundle injected backend functionality, so separation did not serve it's purpose;
+- authentication is different for public-APIs (cookie/session-based) and backend-APIs (headers with Basic/MAC authentication). It takes some effort to configure them correctly in the first place, and security holes can occur due to misconfiguration and complexity;
+- as backend-APIs did not know anything about user authentication (cookies etc.), frontend-APIs became trusted party. Frontend-API authenticates user and passes just her ID to the backend-API. This makes frontend-API credentials (of the system itself, for authenticating to backend-API) really critical - you can impersonate any user just with these single credentials;
+- as system is the same, backend-APIs (which just authenticates these single credentials) are not separated in terms of network - they are still accessible from the network. IP restrictions are configured inside the system, but, as there are many frontend-APIs (which are accessible) and backend-APIs and something in-between, usually this also gets misconfigured;
+- performance degrades, as frontend-API makes additional request to backend-API.
+
+
+Instead, we make single multi-purpose backend-API, accessible directly from Internet.
+For authentication, we use JWT or client credentials (configured to access only needed features, not everything for everyone).
+
+```
+Browser --(request with header)--> BackendApiController --(SQL)--> DB
+```
+
+## Splitting controllers by use-case (administration / frontend)
+
+We should not make `AdministrationApiController`, ever.
+
+This violates other conventions, as it's named after use-case, not functionality. In fact, in cases where it was named like that, one of the following happens:
+
+- at least one endpoint gets used not only by administrators;
+- code gets duplicated as the same endpoint is repeated in another controller;
+- code is refactored to avoid this pattern (of course, this is preferred).
+
+Additionally, it makes routing and prefixes complicated, duplicated, sometimes even conflicting.
+
+So, we make single multi-purpose backend-API. We can split it into several controllers, but it should be done by functionality itself, not their current usage.
+
+As with every endpoint, we configure authorization (permissions needed to perform that action). Administrators just get permission to perform that action.
+
+If needed, partners, other systems or even user herself could also reuse these endpoints.
+
+### URL path prefixes
+
+Some deprecated rules:
+
+- We use `/{_locale}/bundle-name/rest` prefix for all front-end REST routing.
+- We use `/admin/{_locale}/bundle-name/rest` prefix for all administration front-end REST routing.
+
+
+As we avoid splitting APIs, these are deprecated.
+Now we just make single backend API with `/bundle-name/rest/v#` prefix. We pass language(s) in the `Accept-Language` header.
+
+## `--force`
+
+In some commands `--force` command line option is used to "really" perform something. This got misused and is almost never really needed.
+
+As it's used in many places, now we always add this - not only in code before doing something, but when calling, also. And it teaches us that running command will not have any concequences, unless we pass some option. We must not just run some commands without knowing what they do or how they are supposed to work. If we need explanation, we just add `--help` option. By default, command should do what it's supposed to do.
+
+Furthermore, if we always add this, it cannot be used when it would really make sense. This could be, for example, generating file, where `--force` option would always overwrite existing one without even asking.
+
+## `markAs*`
+
+In entities, we used to add `markAsDone` and similar methods for changing entity state. We tend to keep "long" version of this - `setStatus(Entity::STATUS_DONE)` so that we could easily find usages in the project without doing 2 iterations (first by `setStatus` and/or constant, then by `markAsX` method).
+
+## common libraries / bundles
+
+As we use classes in both backend applications and PHP client code, we used to move some common parts to separate library. For example:
+
+```
+AuthorizationBundle
+    Entity
+        Card
+    Transformer
+        CardToCommonCardTransformer
+        CommonCardToCardTransformer
+AuthorizationCommonBundle
+    Entity
+        Card
+    Normalizer
+        CardNormalizer
+AuthorizationRestClientBundle
+    AuthorizationClient
+```
+
+This way we can reuse `CardNormalizer` from common library. As `Card` entity is ususally different in backend and common, we can either extend from common one, or use transformers to convert back and forth.
+
+Such dependencies have several problems:
+
+- additional management for updating several vendor libraries when needed;
+- more complicated than straight-forward mapping from array to objects;
+- we do not need additional normalizer class, but we need transformer classes which usually contain very similar code;
+- normalizers can sometimes differ on backend and client side. When mapping from object to array, backend should include ID and status. On the client side, this is not needed, as we do not pass these fields when creating resource.
+
+
+Better practice is to completely separate client from backend without any common dependencies for models.
+
+To do this, we write RAML specifications for our API endpoints and completely generate client code from RAML.
