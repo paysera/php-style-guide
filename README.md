@@ -3175,10 +3175,11 @@ We always use semantic versioning on library repositories.
 >
 > As it happens, sometimes none of these 2 takes place.
 
-## Backward incompatible changes
+## CHANGELOG.md in semantically versioned repositories
 
-If we make backward incompatible change, we always provide some basic information about what was changed in
-`CHANGELOG.md` or `UPGRADE.md` file.
+We require `CHANGELOG.md` file in semantically versioned repositories.
+On each version change we add record to `CHANGELOG.md` which follows https://keepachangelog.com/en/1.0.0/ recommendations.
+Record should contain any useful information for developer regarding the changes since previous version.
 
 ## Releases
 
