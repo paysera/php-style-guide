@@ -55,7 +55,7 @@ releasing libraries or requiring ones.
     + [Calling parent constructor](#calling-parent-constructor)
     + [Traits](#traits)
     + [Arrays](#arrays)
-  * [Default property values](#default-property-values)
+    + [Default property values](#default-property-values)
   * [Comments](#comments)
     + [PhpDoc on methods](#phpdoc-on-methods)
     + [PhpDoc contents](#phpdoc-contents)
@@ -142,6 +142,7 @@ releasing libraries or requiring ones.
     + [Basic directories for code](#basic-directories-for-code)
     + [Integration with other bundles](#integration-with-other-bundles)
     + [Special directories](#special-directories)
+    + [Bundle namespace](#bundle-namespace)
     + [Example](#example)
   * [Twig](#twig)
     + [Calling methods](#calling-methods)
@@ -167,7 +168,7 @@ releasing libraries or requiring ones.
     + [Pagination](#pagination)
 - [Composer Conventions](#composer-conventions)
   * [Semantic versioning](#semantic-versioning)
-  * [Backward incompatible changes](#backward-incompatible-changes)
+  * [Changelog](#changelog)
   * [Releases](#releases)
   * [Reviewing tagging policy](#reviewing-tagging-policy)
   * [Initial library development](#initial-library-development)
@@ -1178,7 +1179,7 @@ The only valid case for traits is in unit test classes. We avoid using traits in
 
 We always use short array syntax (`[1, 2]` instead of `array(1, 2)`) where PHP code-level allows it.
 
-## Default property values
+### Default property values
 
 If we need to define some default value for class property, we do this in constructor, not in property declaration.
 
@@ -2280,8 +2281,8 @@ namespace `Service/`, but in separate namespaces such as `Processor/`.
 ```php
 <?php
 
-// namespace Acme\Bundle\FooBundle\Service; // Incorrect
-namespace Acme\Bundle\FooBundle\Processor; // Correct
+// namespace Acme\FooBundle\Service; // Incorrect
+namespace Acme\FooBundle\Processor; // Correct
 
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -2509,7 +2510,7 @@ get used in such cases. For example:
 ```sql
 SELECT * FROM ext_log_entries e0_
 WHERE e0_.object_id = 21590
-      AND e0_.object_class = 'Acme\\Bundle\\UserBundle\\Entity\\User'
+      AND e0_.object_class = 'Acme\\UserBundle\\Entity\\User'
 ORDER BY e0_.version DESC;
 ```
 
@@ -2518,7 +2519,7 @@ Correct usage:
 ```sql
 SELECT * FROM ext_log_entries e0_
 WHERE e0_.object_id = '21590'
-      AND e0_.object_class = 'Acme\\Bundle\\UserBundle\\Entity\\User'
+      AND e0_.object_class = 'Acme\\UserBundle\\Entity\\User'
 ORDER BY e0_.version DESC;
 ```
 
@@ -2692,13 +2693,19 @@ PageBlock/MenuProvider.php
 ### Special directories
 
 -   `Resources` - for resources
--   `Tests` - for tests. Test for `Vendor/Bundle/SomeBundle/Namespace/Service` goes to
-`Vendor/Bundle/SomeBundle/Tests/Namespace/ServiceTest`
+-   `Tests` - for tests. Test for `Vendor/SomeBundle/Namespace/Service` goes to
+`Vendor/SomeBundle/Tests/Namespace/ServiceTest`
+
+### Bundle namespace
+
+We don't use `\Bundle\` sub-namespace after the vendor for new projects - we use `Vendor\SomeBundle` directly.
+
+In existing projects we make folder structure the same as it's already used there.  
 
 ### Example
 
 ```txt
-Acme/Bundle/PageBundle
+Acme/PageBundle
     Controller
         PageController.php
         PageApiController.php
@@ -2949,7 +2956,7 @@ following example, but we shouldn't:
 ```php
 <?php
 
-namespace Acme\Bundle\NewsletterBundle\Service;
+namespace Acme\NewsletterBundle\Service;
 
 class NewsletterSender
 {
@@ -2969,9 +2976,9 @@ Instead, we create an interface that provides our needed functionality:
 ```php
 <?php
 
-namespace Acme\Bundle\NewsletterBundle\Service;
+namespace Acme\NewsletterBundle\Service;
 
-use Acme\Bundle\NewsletterBundle\Entity\UserData;
+use Acme\NewsletterBundle\Entity\UserData;
 
 interface UserDataProviderInterface
 {
@@ -2982,7 +2989,7 @@ interface UserDataProviderInterface
 ```php
 <?php
 
-namespace Acme\Bundle\NewsletterBundle\Entity;
+namespace Acme\NewsletterBundle\Entity;
 
 class UserData
 {
@@ -3039,7 +3046,7 @@ And we refactor our service:
 ```php
 <?php
 
-namespace Acme\Bundle\NewsletterBundle\Service;
+namespace Acme\NewsletterBundle\Service;
 
 class NewsletterSender
 {
@@ -3068,10 +3075,10 @@ we do that in another bundle.
 
 ```php
 <?php
-namespace Acme\Bundle\IntegrationBundle\Service;
+namespace Acme\IntegrationBundle\Service;
 
-use Acme\Bundle\NewsletterBundle\Entity\UserData;
-use Acme\Bundle\NewsletterBundle\Service\UserDataProviderInterface;
+use Acme\NewsletterBundle\Entity\UserData;
+use Acme\NewsletterBundle\Service\UserDataProviderInterface;
 
 class UserDataProvider implements UserDataProviderInterface
 {
@@ -3092,7 +3099,7 @@ class UserDataProvider implements UserDataProviderInterface
 We configure the service as usual (inside `IntegrationBundle` in this case):
 ```xml
 <service id="integration.user_data_provider"
-         class="Acme\Bundle\IntegrationBundle\Service\UserDataProvider"/>
+         class="Acme\IntegrationBundle\Service\UserDataProvider"/>
 ```
 
 For our bundle to get the service from outside, we modify `Configuration` and `Extension` classes and configure
@@ -3101,7 +3108,7 @@ the service in `config.yml`:
 ```php
 <?php
 
-namespace Acme\Bundle\NewsletterBundle\DependencyInjection;
+namespace Acme\NewsletterBundle\DependencyInjection;
 
 // ...
 
@@ -3121,7 +3128,7 @@ class Configuration implements ConfigurationInterface
 ```php
 <?php
 
-namespace Acme\Bundle\NewsletterBundle\DependencyInjection;
+namespace Acme\NewsletterBundle\DependencyInjection;
 
 // ...
 
@@ -3149,7 +3156,7 @@ Now we can use our service inside our bundle:
 
 ```xml
 <service id="acme_newsletter.newsletter_sender"
-         class="Acme\Bundle\NewsletterBundle\Service\NewsletterSender">
+         class="Acme\NewsletterBundle\Service\NewsletterSender">
     <argument type="service" id="acme_newsletter.user_data_provider"/>
 </service>
 ```
@@ -3175,10 +3182,13 @@ We always use semantic versioning on library repositories.
 >
 > As it happens, sometimes none of these 2 takes place.
 
-## Backward incompatible changes
+## Changelog
 
-If we make backward incompatible change, we always provide some basic information about what was changed in
-`CHANGELOG.md` or `UPGRADE.md` file.
+For libraries where semantic vensioning is used, we maintain the [`CHANGELOG.md` file]((https://keepachangelog.com/en/1.0.0/)).
+
+If the file is missing, we create it and port changes from other sources, like `UPGRADE.md` (deleting that file afterwards).
+
+Any commit must also have a change in `CHANGELOG.md` file with described changes.
 
 ## Releases
 
@@ -3210,12 +3220,11 @@ landed our changes.
 
 ## Reviewing tagging policy
 
-In differential revision we always comment on intended tagging policy - `MAJOR`, `MINOR` or `PATCH`.
-As this can change (wrong initial policy denied by review or changed after additional commits in review),
-we provide this information in a summary or in a comment, not in commit message (title of revision).
+The tagging policy is always visible in `CHANGELOG.md` file - we don't use `Unreleased` block for internal libraries
+that are updated for some concrete purpose (to be updated right afterwards in another project). 
 
-Reviewer must reject a diff, if `MAJOR` bump is needed and no information was provided about backward incompatible
-changes in `CHANGELOG.md` or `UPGRADE.md` files.
+It's important to keep it updated and in-sync if any other changes are made in master after our diff - one should
+be careful when rebasing this file.
 
 ## Initial library development
 
