@@ -494,7 +494,7 @@ Wrong:
 ```php
 <?php
 
-namespace Some/Namespace;
+namespace Some\Namespace;
 
 // ...
 
@@ -509,7 +509,7 @@ Right:
 ```php
 <?php
 
-namespace Some/Namespace;
+namespace Some\Namespace;
 
 use Vendor\Namespace\Entity\Value;
 
