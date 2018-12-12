@@ -25,7 +25,7 @@ releasing libraries or requiring ones.
     + [Splitting in several lines](#splitting-in-several-lines)
     + [Chained method calls](#chained-method-calls)
     + [Constructors](#constructors)
-    + [Variable, class and function naming](#variable--class-and-function-naming)
+    + [Variable, class and function naming](#variable-class-and-function-naming)
     + [Order of methods](#order-of-methods)
     + [Directories and namespaces](#directories-and-namespaces)
     + [Comparison order](#comparison-order)
@@ -36,7 +36,7 @@ releasing libraries or requiring ones.
     + [Strict comparison operators](#strict-comparison-operators)
     + [Converting to boolean](#converting-to-boolean)
     + [Comparing to boolean](#comparing-to-boolean)
-    + [Comparing to `null`](#comparing-to--null-)
+    + [Comparing to `null`](#comparing-to-null)
     + [Assignments in conditions](#assignments-in-conditions)
     + [Unnecessary variables](#unnecessary-variables)
     + [Reusing variables](#reusing-variables)
@@ -46,7 +46,7 @@ releasing libraries or requiring ones.
     + [Double quotes](#double-quotes)
     + [Visibility](#visibility)
     + [Functions](#functions)
-    + [`str_replace`](#-str-replace-)
+    + [`str_replace`](#str_replace)
     + [Return and argument types](#return-and-argument-types)
     + [Type-hinting classes and interfaces](#type-hinting-classes-and-interfaces)
     + [Dates](#dates)
@@ -70,9 +70,9 @@ releasing libraries or requiring ones.
   * [Thin model](#thin-model)
   * [Services without run-time state](#services-without-run-time-state)
   * [Composition over inheritance](#composition-over-inheritance)
-  * [Services (objects) over classes, configuration over run-time parameters](#services--objects--over-classes--configuration-over-run-time-parameters)
+  * [Services (objects) over classes, configuration over run-time parameters](#services-objects-over-classes-configuration-over-run-time-parameters)
     + [Constant usage](#constant-usage)
-  * [Small, understandable methods](#small--understandable-methods)
+  * [Small, understandable methods](#small-understandable-methods)
   * [Dependencies](#dependencies)
     + [No unnecessary dependencies](#no-unnecessary-dependencies)
     + [No circular dependencies](#no-circular-dependencies)
@@ -89,7 +89,7 @@ releasing libraries or requiring ones.
 - [Symfony related conventions](#symfony-related-conventions)
   * [Configuration](#configuration)
     + [Configuration inside bundles](#configuration-inside-bundles)
-    + [Configuration in `app` directory](#configuration-in--app--directory)
+    + [Configuration in `app` directory](#configuration-in-app-directory)
     + [Parameters dist files](#parameters-dist-files)
     + [Files](#files-1)
     + [Naming](#naming)
@@ -107,12 +107,12 @@ releasing libraries or requiring ones.
     + [Only custom methods from outside of repository](#only-custom-methods-from-outside-of-repository)
     + [Repositories from other bundles](#repositories-from-other-bundles)
     + [Prefetching and filtering at the same time](#prefetching-and-filtering-at-the-same-time)
-    + [Searching / paginating by date](#searching---paginating-by-date)
+    + [Searching / paginating by date](#searching--paginating-by-date)
   * [Entities](#entities)
     + [Setters](#setters)
     + [Setters vs adders](#setters-vs-adders)
     + [Relations in setters](#relations-in-setters)
-    + [States, types etc.](#states--types-etc)
+    + [States, types etc.](#states-types-etc)
     + [ID](#id)
     + [Creation date](#creation-date)
     + [Updated at](#updated-at)
@@ -3184,7 +3184,7 @@ We always use semantic versioning on library repositories.
 
 ## Changelog
 
-For libraries where semantic vensioning is used, we maintain the [`CHANGELOG.md` file]((https://keepachangelog.com/en/1.0.0/)).
+For libraries where semantic vensioning is used, we maintain the [`CHANGELOG.md` file](https://keepachangelog.com/en/1.0.0/).
 
 If the file is missing, we create it and port changes from other sources, like `UPGRADE.md` (deleting that file afterwards).
 
