@@ -1239,9 +1239,11 @@ class MyClass
 
 #### No PhpDoc on fully strictly typed methods
 
-We put a PhpDoc comment on methods where the return and argument types cannot be determined by the IDE. For example, 
-prior to PHP 7.0, we would need a PhpDoc to type-hint scalar types. In PHP 7, the scalar types would be strictly 
-typed and PhpDoc is not needed.
+We put a PhpDoc comment on methods where the return and argument types are not type-hinted in the method signature. For 
+example, prior to PHP 7.0, we would need a PhpDoc to type-hint scalar types. In PHP 7, the scalar types would be 
+strictly typed and PhpDoc is not needed.
+
+If a method signature is strictly typed in full, PhpDoc is forbidden.
 
 Wrong:
 ```php
@@ -1266,28 +1268,10 @@ public function getLimit(Client $client, string $type): Money;
 public function setNumber($number);
 ```
 
-#### PhpDoc on constructors
+#### Additional information in PhpDoc
 
-We put a PhpDoc comment on constructors only when the IDE cannot guess the type of properties that the constructor 
-sets. For example, if we inject a scalar type and its argument is not strictly typed, we must put a PhpDoc comment.
-
-Wrong:
-```php
-/**
- * @param int $a
- */
-public function __constructor(int $a) { /* ... */ }
-```
-
-Correct:
-```php
-public function __constructor(int $a) { /* ... */ }
-```
-
-#### PhpDoc parameters other than @param and @return 
-
-If phpdoc tags other than "param" or "return" are used (for example, a text description or other PhpDoc tags),
- we will add a full phpdoc like the following:
+If description or parameter descriptions, or phpdoc tags other than "param" or "return" are used (for example, a text 
+description or other PhpDoc tags), we will add a full phpdoc like the following:
 
 ```php
 /**
@@ -1326,6 +1310,16 @@ A full PhpDoc is required when at least one of the parameters or the return type
  * @return Money|null
  */
 public function getDayLimit(Client $client);
+```
+
+```php
+/**
+ * @return void
+ */
+public function doSomethingWithoutReturn()
+{
+    $this->foo->bar();
+}
 ```
 
 Starting with PHP 7.1, nullable return types can be type-hinted in the code, so PhpDoc is not necessary:
