@@ -1237,15 +1237,91 @@ class MyClass
 
 ### PhpDoc on methods
 
-We put PhpDoc comment on all methods with exception of constructors (can be skipped in some cases).
+#### No PhpDoc on fully strictly typed methods
 
-We put PhpDoc comment on constructors when IDE (for example PhpStorm) cannot guess classes of attributes,
-return type etc. It’s optional otherwise. For example, if we inject some scalar type, we must put PhpDoc comment.
+We put a PhpDoc comment on methods where the return and argument types are not type-hinted in the method signature. For 
+example, prior to PHP 7.0, we would need a PhpDoc to type-hint scalar types. In PHP 7, the scalar types would be 
+strictly typed and PhpDoc is not needed.
+
+If PhpDoc does not add any other information that's already provided with typehints, we don't use PhpDoc at all.
+
+Wrong:
+```php
+/**
+ * @param Client $client
+ * @param string $type
+ *
+ * @return Money
+ */
+public function getLimit(Client $client, string $type): Money;
+
+public function setNumber($number);
+```
+
+Correct:
+```php
+public function getLimit(Client $client, string $type): Money;
+
+/**
+ * @param int $number
+ */
+public function setNumber($number);
+```
+
+> **Why?** Any comment needs to be maintained – if we add parameter, change parameter or return type, we must also update the PhpDoc. If PhpDoc does not add any additional information, it just duplicates information that's already provided.
+
+#### Additional information in PhpDoc
+
+If method description, parameter descriptions or any other PhpDoc tags other than `@param` and `@return` are used, we will add a full phpdoc like the following:
+
+```php
+/**
+ * Gets a day limit starting from midnight.
+ *
+ * @see http://example.com/
+ *
+ * @param Client $client
+ *
+ * @return Money
+ */
+public function getDayLimit(Client $client): Money;
+```
+
+#### PhpDoc on arrays
+
+When we take as an argument or return an array of strictly typed elements, we should add a PhpDoc to describe the 
+type of elements in the array.
+
+```php
+/**
+ * @param Client[]|array $clients
+ *
+ * @return Money
+ */
+public function getDayLimitForClients(array $clients): Money;
+```
+
+#### PhpDoc on nullable return types
+
+A full PhpDoc is required when at least one of the parameters or the return type is not strictly typed:
+```php
+/**
+ * @param Client $client
+ *
+ * @return Money|null
+ */
+public function getDayLimit(Client $client);
+```
+
+Starting with PHP 7.1, nullable return types can be type-hinted in the code, so PhpDoc is not necessary:
+```php
+public function getDayLimit(Client $client): ?Money;
+``` 
 
 ### PhpDoc contents
 
 If we use PhpDoc comment, it must contain all information about parameters, return type and exceptions that the method
-throws. If method does not return anything, we skip `@return` comment.
+throws. If method does not return anything, we skip `@return` tag.
 
 > sometimes scalar types are not autocompleted by IDE, but must be provided by this requirement.
 > Example: `@param string $param1`
