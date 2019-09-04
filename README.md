@@ -58,6 +58,7 @@ releasing libraries or requiring ones.
     + [Traits](#traits)
     + [Arrays](#arrays)
     + [Default property values](#default-property-values)
+    + [Scalar typehints](#scalar-typehints)
   * [Comments](#comments)
     + [PhpDoc on methods](#phpdoc-on-methods)
     + [PhpDoc contents](#phpdoc-contents)
@@ -1232,6 +1233,109 @@ class MyClass
         $this->three = 3;
         $this->four = false;
         $this->createdAt = new \DateTime();
+    }
+}
+```
+
+### Scalar typehints
+
+#### Strict types declaration is required
+
+For newly written files we always add `declare(strict_types=1);` at the top of the file.
+
+We add it for already existing files if we can guarantee that no negative side-effects would be caused by it.
+It's safer to type-cast variables in the file to the correct scalar types to keep the consistent behavior.
+
+#### Always use scalar typehints where appropriate
+
+We always use scalar typehints both for arguments and return types, unless our code with them would not work 
+as intended so we are forced not to use them.
+
+For already existing methods we can add scalar typehints but we're responsible to guarantee that any place 
+in the project that has strict types declaration and calls this method always passes the correct type as an argument.
+We could add typecast in the places where we're not guaranteed to keep the consistent behavior.
+
+If we add scalar typehint for any argument in a public method in our library, this means that major release is needed.
+Scalar typehints can be always safely added to return values if needed, though.
+
+```php
+<?php
+ 
+declare(strict_types=1); // this is required for new files
+ 
+class Something
+{
+    /**
+     * @var int|null
+     */
+    private $b;
+ 
+    public function increment(int $a): int //if we can declare it, we declare types both for arguments and return type
+    {
+        return $a + 1;
+    }
+ 
+    public function setBPhp70Style(int $b = null): self //PHP 7.0 only
+    {
+        $this->b = $b;
+ 
+        return $this;
+    }
+ 
+    public function setBPhp71AndUpStyle(?int $b): self //PHP 7.1 and up
+    {
+        $this->b = $b;
+ 
+        return $this;
+    }
+ 
+    /**
+     * @return int|null
+     */
+    public function getBPhp70Style() //We can not provide nullable return type hint in PHP 7.0
+    {
+        return $this->b;
+    }
+ 
+    public function getBPhp71AndUpStyle(): ?int //PHP 7.1 and up supports nullable types so we use them
+    {
+        return $this->b;
+    }
+}
+ 
+// some old interface from some old library we have to implement
+interface SomeOldInterface
+{
+    /**
+     * @param string $withSomething
+     * @return Result[]
+     */
+    public function doOldStuff($withSomething);
+}
+ 
+class OurShinyNewClass implements SomeOldInterface
+{
+    /**
+     * @param string $withSomething
+     * @return Result[]
+     */
+    public function doOldStuff($withSomething): array // we can not declare argument type, but we can narrow return type
+    {
+        return [];
+    }
+     
+    /**
+     * @param Result[] $results
+     * @return int[]
+     */
+    public function getSomeIntProperty(array $results): array
+    {
+        return array_map(
+            function (Result $result): int {
+                return $result->getSomeIntProperty();
+            },
+            $results
+        );
     }
 }
 ```
