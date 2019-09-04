@@ -14,6 +14,8 @@ releasing libraries or requiring ones.
 
 # Table of contents
 
+<!-- toc -->
+
 - [PHP Basics](#php-basics)
   * [Basics](#basics)
     + [PHP code-level](#php-code-level)
@@ -152,6 +154,12 @@ releasing libraries or requiring ones.
   * [Symfony version and new projects](#symfony-version-and-new-projects)
     + [Version and structure](#version-and-structure)
     + [Configuration](#configuration-2)
+  * [REST in PHP](#rest-in-php)
+    + [REST controllers](#rest-controllers)
+    + [Result providers](#result-providers)
+    + [Extending model](#extending-model)
+    + [Permissions](#permissions)
+    + [Pagination](#pagination)
   * [Migrating from legacy code](#migrating-from-legacy-code)
   * [New features](#new-features)
   * [Managing dependencies](#managing-dependencies)
@@ -160,12 +168,6 @@ releasing libraries or requiring ones.
     + [Configuration](#configuration-3)
     + [Example](#example-1)
   * [Database migrations](#database-migrations)
-  * [REST in PHP](#rest-in-php)
-    + [REST controllers](#rest-controllers)
-    + [Result providers](#result-providers)
-    + [Extending model](#extending-model)
-    + [Permissions](#permissions)
-    + [Pagination](#pagination)
 - [Composer Conventions](#composer-conventions)
   * [Semantic versioning](#semantic-versioning)
   * [Changelog](#changelog)
@@ -175,6 +177,7 @@ releasing libraries or requiring ones.
   * [Constraints on library versions](#constraints-on-library-versions)
   * [Constraints on vendors](#constraints-on-vendors)
 
+<!-- tocstop -->
 
 # PHP Basics
 
