@@ -2567,11 +2567,16 @@ class FooProcessor
 
 ### Database types and definitions
 
-When we use Doctrine `string` type, we use length of `255` or bigger if needed.
+When we use Doctrine `string` type, we try to figure out sensible maximum length for each case separately, we
+shouldn't just use `255` as default one.
 
-> **Why?** There is no real advantage in using less than `255`.
-> It does not add performance, does not save space and can only cause difficulties if some smaller defined
-> max length is reached.
+We should always validate or ensure in some other way that the length of the value fits to the maximum length
+before storing it to the database.
+
+> **Why?** While maximum length does not affect size in disk, it can affect performance. When INTERNAL TEMPORARY
+tables are created (for joins, derived tables, counts, group by, order by etc), it's created in RAM only if intermediate
+results are small enough. This size is calculated taking maximum length of fields, and not actually used space.
+Thus unnecessary bigger maximum lengths can cause more I/O on the server and slower query times.
 
 ### Database naming
 
