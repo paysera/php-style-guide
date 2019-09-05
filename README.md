@@ -64,7 +64,7 @@ releasing libraries or requiring ones.
     + [PhpDoc contents](#phpdoc-contents)
     + [PhpDoc on properties](#phpdoc-on-properties)
     + [Fluid interface](#fluid-interface)
-    + [Multiple return types](#multiple-return-types)
+    + [Multiple available types](#multiple-available-types)
     + [Deprecations](#deprecations)
     + [Additional comments](#additional-comments)
     + [Comment styles](#comment-styles)
@@ -1045,6 +1045,78 @@ function payback($requestId)
 > is indeed taken into account. For example, return `false` on failure, even if this failure is not handled anyhow by
 > the functionality that's calling your method.
 
+#### Correct typehinting for possibly uninitialized properties
+
+If we declare some class property type as not nullable, after that class object construction
+it should never be or become null.
+
+To rephrase from other perspective – if property is not initialized in the constructor, it's type must be nullable.
+
+This also applies for typehints in PhpDoc of properties.
+
+Examples:
+```php
+<?php
+ 
+declare(strict_types=1);
+ 
+class SomeClass
+{
+    /**
+     * @var int|null    –> this must include `|null`, as `$id` can be uninitialized 
+     */
+    private $id;
+ 
+    public function getId(): ?int   // return value here must be nullable 
+    {
+        return $this->id;
+    }
+ 
+    /**
+     * @return int|null
+     */
+    public function getIdBefore71() 
+    {
+        return $this->id;
+    }
+ 
+    public function setId(int $id): self    // we can use non-nullable type for setter, though
+    {
+        $this->id = $id;
+         
+        return $this;
+    }
+}
+```
+
+```php
+<?php
+ 
+declare(strict_types=1);
+ 
+class SomeClass
+{
+    /**
+     * @var Child|null 
+     */
+    private $child;
+ 
+    public function getChild(): Child
+    {
+        if ($this->child === null) {
+            throw new RuntimeException('child is not initialized yet');
+        }
+        
+        return $this->child;
+    }
+ 
+    public function hasChild(): bool
+    {
+        return $this->child !== null;
+    }
+}
+```
+
 
 ### Type-hinting classes and interfaces
 
@@ -1379,7 +1451,8 @@ public function setNumber($number);
 
 #### Additional information in PhpDoc
 
-If method description, parameter descriptions or any other PhpDoc tags other than `@param` and `@return` are used, we will add a full phpdoc like the following:
+If method description, parameter descriptions or any other PhpDoc tags other than `@param` and `@return` are used
+ we will add a full PhpDoc like the following:
 
 ```php
 /**
@@ -1441,15 +1514,14 @@ We use PhpDoc on properties that are not injected via constructor.
 We do *not* put PhpDoc on services, that are type-casted and injected via constructor, as they are automatically
 recognised by IDE and desynchronization between typecast and PhpDoc can cause warnings to be silenced.
 
-We may add PhpDoc on properties that are injected via constructor and are scalar, but this is not necessary as IDE
-gets the type from constructor's PhpDoc.
+If property value is not set in constructor, we must always add `|null` to the PhpDoc of that property.
 
 ### Fluid interface
 
 If method returns `$this`, we use `@return $this` that IDE could guess correct type if we use this method
 for objects of sub-classes.
 
-### Multiple return types
+### Multiple available types
 
 If we return or take as an argument value that has few types or can be one of few types,
 we provide all of them separated by `|`.
