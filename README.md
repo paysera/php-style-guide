@@ -2357,9 +2357,9 @@ return $this->createQueryBuilder('user')
     ->select('user, email')
     ->leftJoin('user.emails', 'email')
     ->where('email.status = :activeStatus')
-    ->setParameters(array(
+    ->setParameters([
         'activeStatus' => User::STATUS_ACTIVE,
-    ))
+    ])
     ->getQuery()
     ->getResult()
 ;
@@ -2377,8 +2377,10 @@ $user->getEmails();  // this will also return *only* active emails, as the user 
 What are the options?
 
 1) change `->select('c, a')` to `->select('c')`, so we do not pre-fetch accounts;
-2) pre-fetch them with a separate join:
-
+2) pre-fetch them with a separate join:  
+Keep in mind that pre-fetching is OK and recommended in most of the cases where we will use those relations.
+It's just not good if we also filter by that relation.  
+Further work and filtering should still be done within the code as results will contain users with at least one active email, but won't have users which all emails are not active - in other words we filter out users without active emails.
 ```php
 <?php
 return $this->createQueryBuilder('user')
@@ -2386,16 +2388,46 @@ return $this->createQueryBuilder('user')
     ->leftJoin('user.emails', 'email')
     ->leftJoin('user.emails', 'activeEmail')
     ->where('activeEmail.status = :activeStatus')
-    ->setParameters(array(
+    ->setParameters([
         'activeStatus' => User::STATUS_ACTIVE,
-    ))
+    ])
     ->getQuery()
     ->getResult()
 ;
+// ---
+foreach ($users as $user) {
+    foreach ($user->getEmails() as $email) {
+        if ($email->getStatus() === User::STATUS_ACTIVE) {
+            // do something
+        }
+    }
+}
 ```
+3) select only those fields which are relevant for you within that specific case:  
+Entities won't be resolved, plain array would be returned, hence Doctrine's identity map is not built.
+```php
+$result = $this->createQueryBuilder('user')
+    ->select('user.name AS userName, email.email AS userEmail, email.status AS emailStatus')
+    ->leftJoin('user.emails', 'email')
+    ->where('email.status = :activeStatus')
+    ->setParameters([
+        'activeStatus' => User::STATUS_ACTIVE,
+    ])
+    ->getQuery()
+    ->getResult()
+;
 
-Keep in mind that pre-fetching is OK and recommended in most of the cases where we will use those relations.
-It's just not good if we also filter by that relation.
+$return = [];
+foreach ($result as $item) {
+    $return[] = (new NormalizedReturnObject())
+        ->setUserName($item['userName'])
+        ->setUserEmail($item['userEmail'])
+        ->setEmailStatus($item['emailStatus'])
+    ;
+}
+
+return $return;
+```
 
 
 ### Searching / paginating by date
