@@ -2377,23 +2377,27 @@ $user->getEmails();  // this will also return *only* active emails, as the user 
 What are the options?
 
 1) change `->select('c, a')` to `->select('c')`, so we do not pre-fetch accounts;
-2) pre-fetch them without filtering:  
+2) pre-fetch them with a separate join:  
 Keep in mind that pre-fetching is OK and recommended in most of the cases where we will use those relations.
 It's just not good if we also filter by that relation.  
-When pre-fetching relation there is no point for separate join as in the end results will contain all emails.  
-Further work and filtering should be done within the code.
+Further work and filtering should still be done within the code as results will contain users with at least one active email, but won't have users which all emails are not active - in other words we filter out users without active emails.
 ```php
 <?php
 return $this->createQueryBuilder('user')
     ->select('user, email')
     ->leftJoin('user.emails', 'email')
+    ->leftJoin('user.emails', 'activeEmail')
+    ->where('activeEmail.status = :activeStatus')
+    ->setParameters([
+        'activeStatus' => User::STATUS_ACTIVE,
+    ])
     ->getQuery()
     ->getResult()
 ;
 // ---
 foreach ($users as $user) {
     foreach ($user->getEmails() as $email) {
-        if ($email->getStatus() === 'active') {
+        if ($email->getStatus() === User::STATUS_ACTIVE) {
             // do something
         }
     }
