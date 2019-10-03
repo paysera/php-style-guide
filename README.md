@@ -59,6 +59,7 @@ releasing libraries or requiring ones.
     + [Arrays](#arrays)
     + [Default property values](#default-property-values)
     + [Scalar typehints](#scalar-typehints)
+    + [Void typehints](#void-typehints)
   * [Comments](#comments)
     + [PhpDoc on methods](#phpdoc-on-methods)
     + [PhpDoc contents](#phpdoc-contents)
@@ -1408,6 +1409,29 @@ class OurShinyNewClass implements SomeOldInterface
             },
             $results
         );
+    }
+}
+```
+
+### Void typehints
+
+For functions and methods that do not return value, we should typehint return value as `: void`.
+
+```php
+<?php
+ 
+declare(strict_types=1);
+ 
+class SomeClass
+{
+    public function doSomething(): void // we must typehint return value as `void` here as method does not return anything
+    {
+        echo "Hi!";
+    }
+ 
+    public function returnMixed() // no typehint will be used only for cases where we do not guarantee some exact return type
+    {
+        return $_GET['something'];
     }
 }
 ```
