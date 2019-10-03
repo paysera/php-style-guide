@@ -1,7 +1,7 @@
 Paysera PHP style guide
 =====
 
-Paysera PHP style guide extends [PSR-1](https://www.php-fig.org/psr/psr-1/) and [PSR-2](https://www.php-fig.org/psr/psr-2/),
+Paysera PHP style guide extends [PSR-1](https://www.php-fig.org/psr/psr-1/) and [PSR-12](https://www.php-fig.org/psr/psr-12/),
 so code must also follow these standards to be compatible with this style guide.
 
 Guide is divided into several parts:
