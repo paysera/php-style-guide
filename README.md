@@ -152,7 +152,7 @@ releasing libraries or requiring ones.
     + [Calling methods](#calling-methods)
   * [Commands](#commands)
     + [Naming](#naming-1)
-    + [Dependencies](#dependencies-1)
+    + [Commands as services](#commands-as-services)
   * [Symfony version and new projects](#symfony-version-and-new-projects)
     + [Version and structure](#version-and-structure)
     + [Configuration](#configuration-2)
@@ -3072,12 +3072,11 @@ We prefer using static templates with JS framework and REST API over twig.
 
 If command name consists of several words, we use dashes to separate them. For example, `some-namespace:do-something`
 
-### Dependencies
+### Commands as services
 
-If project uses Sf 2.4 and above, we register commands as services with dependencies injected into them.
+We register commands as services with dependencies injected into them.
 
-For Sf 2.3 we take dependencies from service container.
-
+We use lazy loading by always providing attribute with command name in the tag ([see documentation](https://symfony.com/doc/3.4/console/commands_as_services.html#lazy-loading)).
 
 ## Symfony version and new projects
 
