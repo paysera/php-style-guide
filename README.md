@@ -2737,8 +2737,8 @@ Also this would make understanding structure, debugging and testing harder.
 
 #### We do not store Money objects themselves
 
-As money object is 1) immutable 2) never compared by reference, we do not store the object itself in Entity.
-We store only it's internal fields and recreate it when needed. This makes code simpler.
+As money object is 1) immutable 2) never compared by reference, we do not store the object itself in Doctrine-persisted Entities.
+We store only it's internal fields and recreate it when needed. This makes the code simpler.
 
 ```php
 <?php
@@ -2770,6 +2770,8 @@ class Entity
     }
 }
 ```
+
+If Entity is not persisted by Doctrine, we just store Money object itself as usual.
 
 #### We store amount as decimal
 
