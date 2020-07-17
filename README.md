@@ -1830,7 +1830,7 @@ required in another place. With duplicated code, different behavior and can occu
 We prefer concrete methods instead of one abstract method to change state.
 
 This allows us to see available actions and make our code clearer:
-no `switch` statements, event maps, complex validation rules, nested \`if\`s or similar magic.
+no `switch` statements, event maps, complex validation rules, nested `if`\`s or similar magic.
 
 ```php
 <?php
