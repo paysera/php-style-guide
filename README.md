@@ -1823,7 +1823,7 @@ Manager can make the following actions:
 -   make some additional actions.
 
 If state is changed in a controller or some other place, duplicated code can occur when functionality is
-required in another place. With duplicated code, different behavior and can occur, which eventually leads to bugs.
+required in another place. With duplicated code, different behavior can occur, which eventually leads to bugs.
 
 #### Methods for changing state
 
