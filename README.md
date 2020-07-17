@@ -1823,14 +1823,14 @@ Manager can make the following actions:
 -   make some additional actions.
 
 If state is changed in a controller or some other place, duplicated code can occur when functionality is
-required in another place. With duplicated code, different behavior can occur, which eventually leads to bugs.
+required in another place. With duplicated code, different behavior and can occur, which eventually leads to bugs.
 
 #### Methods for changing state
 
 We prefer concrete methods instead of one abstract method to change state.
 
 This allows us to see available actions and make our code clearer:
-no `switch` statements, event maps, complex validation rules, nested \`if\`s or similar magic.
+no `switch` statements, event maps, complex validation rules, nested `if`'s or similar magic.
 
 ```php
 <?php
