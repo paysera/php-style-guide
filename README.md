@@ -2198,6 +2198,10 @@ We can use class name as service ID (or alias it) when we are providing open-sou
 This allows others to use autowiring features if needed, even if we don't use them.
 We should only use this for public services - ones that are to be used outside of our bundle.
 
+Exception: for controllers we use classname as service ID.
+> **Why?** Because routing annotations work only when controller's service ID is it's classname 
+> (otherwise it has no way to know it).
+
 #### Autoconfiguration and autowiring
 
 We don't use autowiring and autoconfiguration features of Dependency Injection component.
@@ -3120,7 +3124,7 @@ Keep in mind that there are different skeletons for WEB, REST API and processing
 
 ### REST controllers
 
-For REST controllers, we use [`PayseraRestBundle`](https://github.com/paysera/lib-rest-bundle) and normalizers.
+For REST controllers, we use [`PayseraApiBundle`](https://github.com/paysera/lib-api-bundle) and normalizers.
 
 Controller methods return entities or scalar variables.
 
@@ -3133,6 +3137,9 @@ We can use plain normalizer or plain item normalizer if needed.
 ### Result providers
 
 We use result provider to give `Result` entities from REST controller.
+
+Response is automatically normalized using normalizer related to the classname of the returned object. 
+We could override it with additional annotation, if needed.
 
 ### Extending model
 
