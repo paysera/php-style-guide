@@ -1156,7 +1156,7 @@ $myService = new MyService($resultNormalizer, $resultNormalizer);
 
 ### Dates
 
-We use `\DateTimeImmutabble` objects to represent date or date and time inside system.
+We use `\DateTimeImmutable` objects to represent date or date and time inside system.
 
 We use `\DateTimeInterface` where we get the date to be more compatible with functionality that still operates
 `\DateTime` objects.
