@@ -1161,6 +1161,8 @@ We use `\DateTimeImmutable` objects to represent date or date and time inside sy
 We use `\DateTimeInterface` where we get the date to be more compatible with functionality that still operates
 `\DateTime` objects.
 
+> **Why?** Because accident modification of `\DateTime` object can lead to bugs, that is prevented with immutable version by design.
+
 ### Exceptions
 
 #### Throwing
