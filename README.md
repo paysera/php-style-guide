@@ -2575,6 +2575,10 @@ to be sure that the date saved really represents that state change, not some oth
 fields. Even if there is one (besides `id` and `updatedAt`) field in entity, extra one can be added later and this
 would break the functionality (or naming).
 
+### Directory stucture
+
+For new projects using Symfony > 4.0, we use flat directory structure, and do not use bundles. If we need a bundle, we should reconsider our project's needs and structure - maybe this bundle would make more sense as a library or another service. Needless to say, this does not apply to existing projects, so if a project already uses bundles, we continue that. **Why?** Because this encourages smaller, more self-contained projects.
+
 ## Doctrine
 
 ### Flush
