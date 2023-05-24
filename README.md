@@ -16,168 +16,229 @@ releasing libraries or requiring ones.
 
 <!-- toc -->
 
+- [Paysera PHP style guide](#paysera-php-style-guide)
+- [Table of contents](#table-of-contents)
 - [PHP Basics](#php-basics)
-  * [Basics](#basics)
-    + [PHP code-level](#php-code-level)
-    + [Globals](#globals)
-    + [Files](#files)
-    + [Exceptions for code style usage](#exceptions-for-code-style-usage)
-  * [Code style](#code-style)
-    + [Commas in arrays](#commas-in-arrays)
-    + [Splitting in several lines](#splitting-in-several-lines)
-    + [Chained method calls](#chained-method-calls)
-    + [Constructors](#constructors)
-    + [Variable, class and function naming](#variable-class-and-function-naming)
-    + [Order of methods](#order-of-methods)
-    + [Directories and namespaces](#directories-and-namespaces)
-    + [Comparison order](#comparison-order)
-    + [Namespaces and use statements](#namespaces-and-use-statements)
-  * [Usage of PHP features](#usage-of-php-features)
-    + [Condition results](#condition-results)
-    + [Logical operators](#logical-operators)
-    + [Strict comparison operators](#strict-comparison-operators)
-    + [Converting to boolean](#converting-to-boolean)
-    + [Comparing to boolean](#comparing-to-boolean)
-    + [Comparing to `null`](#comparing-to-null)
-    + [Assignments in conditions](#assignments-in-conditions)
-    + [Unnecessary variables](#unnecessary-variables)
-    + [Reusing variables](#reusing-variables)
-    + [Unnecessary structures](#unnecessary-structures)
-    + [Static methods](#static-methods)
-    + [Converting to string](#converting-to-string)
-    + [Double quotes](#double-quotes)
-    + [Visibility](#visibility)
-    + [Functions](#functions)
-    + [`str_replace`](#str_replace)
-    + [Return and argument types](#return-and-argument-types)
-    + [Type-hinting classes and interfaces](#type-hinting-classes-and-interfaces)
-    + [Dates](#dates)
-    + [Exceptions](#exceptions)
-    + [Checking things explicitly](#checking-things-explicitly)
-    + [Calling parent constructor](#calling-parent-constructor)
-    + [Traits](#traits)
-    + [Arrays](#arrays)
-    + [Default property values](#default-property-values)
-    + [Scalar typehints](#scalar-typehints)
-    + [Void typehints](#void-typehints)
-  * [Comments](#comments)
-    + [PhpDoc on methods](#phpdoc-on-methods)
-    + [PhpDoc contents](#phpdoc-contents)
-    + [PhpDoc on properties](#phpdoc-on-properties)
-    + [Fluid interface](#fluid-interface)
-    + [Multiple available types](#multiple-available-types)
-    + [Deprecations](#deprecations)
-    + [Additional comments](#additional-comments)
-    + [Comment styles](#comment-styles)
-  * [IDE Warnings](#ide-warnings)
+  - [Basics](#basics)
+    - [PHP code-level](#php-code-level)
+    - [Globals](#globals)
+    - [Files](#files)
+    - [Exceptions for code style usage](#exceptions-for-code-style-usage)
+    - [Built-in language/framework feature usage](#built-in-languageframework-feature-usage)
+  - [Code style](#code-style)
+    - [Commas in arrays](#commas-in-arrays)
+    - [Splitting in several lines](#splitting-in-several-lines)
+    - [Chained method calls](#chained-method-calls)
+    - [Constructors](#constructors)
+    - [Variable, class and function naming](#variable-class-and-function-naming)
+      - [Full names](#full-names)
+      - [Class naming](#class-naming)
+      - [Interface naming](#interface-naming)
+      - [Property naming](#property-naming)
+      - [Method naming](#method-naming)
+    - [Order of methods](#order-of-methods)
+    - [Directories and namespaces](#directories-and-namespaces)
+      - [Singular namespaces](#singular-namespaces)
+      - [No `*Interface` namespaces](#no-interface-namespaces)
+      - [Different namespaces and service names](#different-namespaces-and-service-names)
+    - [Comparison order](#comparison-order)
+    - [Namespaces and use statements](#namespaces-and-use-statements)
+  - [Usage of PHP features](#usage-of-php-features)
+    - [Condition results](#condition-results)
+    - [Logical operators](#logical-operators)
+    - [Strict comparison operators](#strict-comparison-operators)
+    - [Converting to boolean](#converting-to-boolean)
+    - [Comparing to boolean](#comparing-to-boolean)
+    - [Comparing to `null`](#comparing-to-null)
+    - [Assignments in conditions](#assignments-in-conditions)
+    - [Unnecessary variables](#unnecessary-variables)
+    - [Reusing variables](#reusing-variables)
+    - [Unnecessary structures](#unnecessary-structures)
+    - [Static methods](#static-methods)
+    - [Converting to string](#converting-to-string)
+    - [Double quotes](#double-quotes)
+    - [Visibility](#visibility)
+      - [Public properties](#public-properties)
+      - [Method visibility](#method-visibility)
+    - [Functions](#functions)
+      - [`count`](#count)
+      - [`is_null`](#is_null)
+    - [String manipulation](#string-manipulation)
+    - [Return and argument types](#return-and-argument-types)
+      - [Return types](#return-types)
+      - [Argument types](#argument-types)
+      - [Passing ID](#passing-id)
+      - [Type-hinting optional arguments](#type-hinting-optional-arguments)
+      - [Void result](#void-result)
+      - [Correct typehinting for possibly uninitialized properties](#correct-typehinting-for-possibly-uninitialized-properties)
+    - [Type-hinting classes and interfaces](#type-hinting-classes-and-interfaces)
+      - [Dependencies with several interfaces](#dependencies-with-several-interfaces)
+    - [Dates](#dates)
+    - [Exceptions](#exceptions)
+      - [Throwing](#throwing)
+      - [Catching](#catching)
+    - [Checking things explicitly](#checking-things-explicitly)
+    - [Calling parent constructor](#calling-parent-constructor)
+    - [Traits](#traits)
+    - [Arrays](#arrays)
+    - [Default property values](#default-property-values)
+    - [Scalar typehints](#scalar-typehints)
+      - [Strict types declaration is required](#strict-types-declaration-is-required)
+      - [Always use scalar typehints where appropriate](#always-use-scalar-typehints-where-appropriate)
+    - [Void typehints](#void-typehints)
+  - [Comments](#comments)
+    - [PhpDoc on methods](#phpdoc-on-methods)
+      - [No PhpDoc on fully strictly typed methods](#no-phpdoc-on-fully-strictly-typed-methods)
+      - [Additional information in PhpDoc](#additional-information-in-phpdoc)
+      - [PhpDoc on arrays](#phpdoc-on-arrays)
+    - [PhpDoc contents](#phpdoc-contents)
+    - [PhpDoc on properties](#phpdoc-on-properties)
+    - [Fluid interface](#fluid-interface)
+    - [Multiple available types](#multiple-available-types)
+    - [Deprecations](#deprecations)
+    - [Additional comments](#additional-comments)
+    - [Comment styles](#comment-styles)
+  - [IDE Warnings](#ide-warnings)
 - [Main patterns](#main-patterns)
-  * [Thin model](#thin-model)
-  * [Services without run-time state](#services-without-run-time-state)
-  * [Composition over inheritance](#composition-over-inheritance)
-  * [Services (objects) over classes, configuration over run-time parameters](#services-objects-over-classes-configuration-over-run-time-parameters)
-    + [Constant usage](#constant-usage)
-  * [Small, understandable methods](#small-understandable-methods)
-  * [Dependencies](#dependencies)
-    + [No unnecessary dependencies](#no-unnecessary-dependencies)
-    + [No circular dependencies](#no-circular-dependencies)
-  * [Services](#services)
-    + [Service creation](#service-creation)
-    + [Changing entity state](#changing-entity-state)
-    + [Data types](#data-types)
-    + [One-to-many Relation in Services](#one-to-many-relation-in-services)
-    + [Event dispatcher](#event-dispatcher)
-  * [Handling sensitive values](#handling-sensitive-values)
-    + [Logging](#logging)
-    + [Passing sensitive values as arguments](#passing-sensitive-values-as-arguments)
-    + [Storing sensitive values in entities](#storing-sensitive-values-in-entities)
+  - [Thin model](#thin-model)
+  - [Services without run-time state](#services-without-run-time-state)
+  - [Composition over inheritance](#composition-over-inheritance)
+  - [Services (objects) over classes, configuration over run-time parameters](#services-objects-over-classes-configuration-over-run-time-parameters)
+    - [Constant usage](#constant-usage)
+  - [Small, understandable methods](#small-understandable-methods)
+  - [Dependencies](#dependencies)
+    - [No unnecessary dependencies](#no-unnecessary-dependencies)
+    - [No circular dependencies](#no-circular-dependencies)
+  - [Services](#services)
+    - [Service creation](#service-creation)
+    - [Changing entity state](#changing-entity-state)
+      - [Use of managers](#use-of-managers)
+      - [Methods for changing state](#methods-for-changing-state)
+    - [Data types](#data-types)
+      - [Identifier usage](#identifier-usage)
+      - [Date and time](#date-and-time)
+      - [Money](#money)
+    - [One-to-many Relation in Services](#one-to-many-relation-in-services)
+      - [Structure](#structure)
+      - [Tags](#tags)
+    - [Event dispatcher](#event-dispatcher)
+  - [Handling sensitive values](#handling-sensitive-values)
+    - [Logging](#logging)
+    - [Passing sensitive values as arguments](#passing-sensitive-values-as-arguments)
+    - [Storing sensitive values in entities](#storing-sensitive-values-in-entities)
 - [Symfony related conventions](#symfony-related-conventions)
-  * [Configuration](#configuration)
-    + [Configuration inside bundles](#configuration-inside-bundles)
-    + [Configuration in `app` directory](#configuration-in-app-directory)
-    + [Parameters dist files](#parameters-dist-files)
-    + [Files](#files-1)
-    + [Naming](#naming)
-    + [Services](#services-1)
-    + [Routing](#routing)
-    + [Production configuration](#production-configuration)
-    + [Always full service IDs](#always-full-service-ids)
-  * [Repositories](#repositories)
-    + [Injection](#injection)
-    + [Configuration](#configuration-1)
-    + [Finding by ID](#finding-by-id)
-    + [Queries](#queries)
-    + [Return types](#return-types-1)
-    + [Method naming](#method-naming-1)
-    + [Only custom methods from outside of repository](#only-custom-methods-from-outside-of-repository)
-    + [Repositories from other bundles](#repositories-from-other-bundles)
-    + [Prefetching and filtering at the same time](#prefetching-and-filtering-at-the-same-time)
-    + [Searching / paginating by date](#searching--paginating-by-date)
-  * [Entities](#entities)
-    + [Setters](#setters)
-    + [Setters vs adders](#setters-vs-adders)
-    + [Relations in setters](#relations-in-setters)
-    + [States, types etc.](#states-types-etc)
-    + [ID](#id)
-    + [Creation date](#creation-date)
-    + [Updated at](#updated-at)
-  * [Doctrine](#doctrine)
-    + [Flush](#flush)
-    + [Database types and definitions](#database-types-and-definitions)
-    + [Database naming](#database-naming)
-    + [Class-map](#class-map)
-    + [Extendability pattern instead of class-map](#extendability-pattern-instead-of-class-map)
-    + [Saving Money instances](#saving-money-instances)
-    + [Doctrine migrations](#doctrine-migrations)
-    + [ID column strategy](#id-column-strategy)
-    + [Variable types for query parameters](#variable-types-for-query-parameters)
-  * [Controllers](#controllers)
-    + [As services](#as-services)
-    + [Static templates](#static-templates)
-    + [Parameters passed to view](#parameters-passed-to-view)
-    + [Small controllers](#small-controllers)
-    + [Class naming](#class-naming-1)
-  * [Events](#events)
-    + [Available events](#available-events)
-    + [Event naming](#event-naming)
-    + [Listener naming](#listener-naming)
-    + [Event class naming](#event-class-naming)
-  * [Directory structure](#directory-structure)
-    + [Root bundle directory](#root-bundle-directory)
-    + [Basic directories for code](#basic-directories-for-code)
-    + [Integration with other bundles](#integration-with-other-bundles)
-    + [Special directories](#special-directories)
-    + [Bundle namespace](#bundle-namespace)
-    + [Example](#example)
-  * [Twig](#twig)
-    + [Calling methods](#calling-methods)
-  * [Commands](#commands)
-    + [Naming](#naming-1)
-    + [Commands as services](#commands-as-services)
-  * [Symfony version and new projects](#symfony-version-and-new-projects)
-    + [Version and structure](#version-and-structure)
-    + [Configuration](#configuration-2)
-  * [REST in PHP](#rest-in-php)
-    + [REST controllers](#rest-controllers)
-    + [Result providers](#result-providers)
-    + [Extending model](#extending-model)
-    + [Permissions](#permissions)
-    + [Pagination](#pagination)
-  * [Migrating from legacy code](#migrating-from-legacy-code)
-  * [New features](#new-features)
-  * [Managing dependencies](#managing-dependencies)
-    + [No hardcoded dependencies on legacy code](#no-hardcoded-dependencies-on-legacy-code)
-    + [Interfaces](#interfaces)
-    + [Configuration](#configuration-3)
-    + [Example](#example-1)
-  * [Database migrations](#database-migrations)
+  - [Configuration](#configuration)
+    - [Configuration inside bundles](#configuration-inside-bundles)
+    - [Configuration in `app` directory](#configuration-in-app-directory)
+    - [Parameters dist files](#parameters-dist-files)
+      - [File naming](#file-naming)
+      - [Parameter naming](#parameter-naming)
+      - [Contents](#contents)
+    - [Files](#files-1)
+      - [Imports](#imports)
+      - [Directories](#directories)
+    - [Naming](#naming)
+    - [Services](#services-1)
+      - [Class names](#class-names)
+      - [Factory services](#factory-services)
+      - [ID as FQCN (class name)](#id-as-fqcn-class-name)
+      - [Autoconfiguration and autowiring](#autoconfiguration-and-autowiring)
+    - [Routing](#routing)
+      - [Route prefix](#route-prefix)
+      - [Route naming](#route-naming)
+    - [Production configuration](#production-configuration)
+    - [Always full service IDs](#always-full-service-ids)
+  - [Repositories](#repositories)
+    - [Injection](#injection)
+    - [Configuration](#configuration-1)
+    - [Finding by ID](#finding-by-id)
+    - [Queries](#queries)
+    - [Return types](#return-types-1)
+      - [Basic usage](#basic-usage)
+      - [Advanced usage](#advanced-usage)
+    - [Method naming](#method-naming-1)
+    - [Only custom methods from outside of repository](#only-custom-methods-from-outside-of-repository)
+    - [Repositories from other bundles](#repositories-from-other-bundles)
+    - [Prefetching and filtering at the same time](#prefetching-and-filtering-at-the-same-time)
+    - [Searching / paginating by date](#searching--paginating-by-date)
+  - [Entities](#entities)
+    - [Setters](#setters)
+    - [Setters vs adders](#setters-vs-adders)
+    - [Relations in setters](#relations-in-setters)
+    - [States, types etc.](#states-types-etc)
+    - [ID](#id)
+    - [Creation date](#creation-date)
+    - [Updated at](#updated-at)
+  - [Doctrine](#doctrine)
+    - [Flush](#flush)
+      - [Number of flushes](#number-of-flushes)
+      - [Where to flush](#where-to-flush)
+      - [Multiple flushes](#multiple-flushes)
+    - [Database types and definitions](#database-types-and-definitions)
+    - [Database naming](#database-naming)
+      - [Underscored](#underscored)
+      - [Plural](#plural)
+      - [Prefix](#prefix)
+      - [SQL keywords](#sql-keywords)
+    - [Class-map](#class-map)
+    - [Extendability pattern instead of class-map](#extendability-pattern-instead-of-class-map)
+    - [Saving Money instances](#saving-money-instances)
+      - [No getters for amount and currency](#no-getters-for-amount-and-currency)
+      - [No handling with events](#no-handling-with-events)
+      - [We do not store Money objects themselves](#we-do-not-store-money-objects-themselves)
+      - [We store amount as decimal](#we-store-amount-as-decimal)
+    - [Doctrine migrations](#doctrine-migrations)
+    - [ID column strategy](#id-column-strategy)
+    - [Variable types for query parameters](#variable-types-for-query-parameters)
+  - [Controllers](#controllers)
+    - [As services](#as-services)
+    - [Static templates](#static-templates)
+    - [Parameters passed to view](#parameters-passed-to-view)
+    - [Small controllers](#small-controllers)
+    - [Class naming](#class-naming-1)
+  - [Events](#events)
+    - [Available events](#available-events)
+    - [Event naming](#event-naming)
+    - [Listener naming](#listener-naming)
+    - [Event class naming](#event-class-naming)
+  - [Directory structure](#directory-structure)
+    - [Root bundle directory](#root-bundle-directory)
+    - [Basic directories for code](#basic-directories-for-code)
+    - [Integration with other bundles](#integration-with-other-bundles)
+    - [Special directories](#special-directories)
+    - [Bundle namespace](#bundle-namespace)
+    - [Example](#example)
+  - [Twig](#twig)
+    - [Calling methods](#calling-methods)
+  - [Commands](#commands)
+    - [Naming](#naming-1)
+    - [Commands as services](#commands-as-services)
+  - [Symfony version and new projects](#symfony-version-and-new-projects)
+    - [Version and structure](#version-and-structure)
+    - [Configuration](#configuration-2)
+  - [REST in PHP](#rest-in-php)
+    - [REST controllers](#rest-controllers)
+    - [Result providers](#result-providers)
+    - [Extending model](#extending-model)
+    - [Permissions](#permissions)
+    - [Pagination](#pagination)
+  - [Migrating from legacy code](#migrating-from-legacy-code)
+  - [New features](#new-features)
+  - [Managing dependencies](#managing-dependencies)
+    - [No hardcoded dependencies on legacy code](#no-hardcoded-dependencies-on-legacy-code)
+    - [Interfaces](#interfaces)
+    - [Configuration](#configuration-3)
+    - [Example](#example-1)
+  - [Database migrations](#database-migrations)
 - [Composer Conventions](#composer-conventions)
-  * [Semantic versioning](#semantic-versioning)
-  * [Changelog](#changelog)
-  * [Releases](#releases)
-  * [Reviewing tagging policy](#reviewing-tagging-policy)
-  * [Initial library development](#initial-library-development)
-  * [Constraints on library versions](#constraints-on-library-versions)
-  * [Constraints on vendors](#constraints-on-vendors)
+  - [Semantic versioning](#semantic-versioning)
+  - [Changelog](#changelog)
+  - [Releases](#releases)
+  - [Reviewing tagging policy](#reviewing-tagging-policy)
+  - [Initial library development](#initial-library-development)
+  - [Constraints on library versions](#constraints-on-library-versions)
+  - [Constraints on vendors](#constraints-on-vendors)
+  - [Library version incrementing](#library-version-incrementing)
 
 <!-- tocstop -->
 
@@ -200,6 +261,10 @@ We put every class to it’s own file.
 ### Exceptions for code style usage
 
 If we modify legacy code where some other conventions are used, we can use the same style as it is used there.
+
+### Built-in language/framework feature usage
+We prefer to use built-in features if they exist instead of inventing our own solutions, unless we need a very specific functionality.
+
 
 ## Code style
 
@@ -237,52 +302,52 @@ Some examples:
 ```php
 <?php
 
-return ($a && $b || $c && $d);
+return ($alpha && $beta || $gamma && $delta);
 
 return (
-    $a && $b
-    || $c && $d
+    $alpha && $beta
+    || $gamma && $delta
 );
 
 return ((
-    $a
-    && $b
+    $alpha
+    && $beta
 ) || (
-    $c
-    && $d
+    $gamma
+    && $delta
 ));
 
 return (
     (
-        $a
-        && $b
+        $alpha
+        && $beta
     )
     || (
-        $c
-        && $d
+        $gamma
+        && $delta
     )
 );
 
-return ($a && in_array($b, [1, 2, 3]));
+return ($alpha && in_array($beta, [1, 2, 3]));
 
 return (
-    $a
-    && in_array($b, [1, 2, 3])
+    $alpha
+    && in_array($beta, [1, 2, 3])
 );
 
-return ($a && in_array(
-    $b,
+return ($alpha && in_array(
+    $beta,
     [1, 2, 3]
 ));
 
-return ($a && in_array($b, [
+return ($alpha && in_array($beta, [
     1,
     2,
     3,
 ]));
 
-return ($a && in_array(
-    $b,
+return ($alpha && in_array(
+    $beta,
     [
         1,
         2,
@@ -291,9 +356,9 @@ return ($a && in_array(
 ));
 
 return (
-    $a
+    $alpha
     && in_array(
-        $b,
+        $beta,
         [
             1,
             2,
@@ -389,8 +454,8 @@ We use nouns or adjectives for property names, not verbs or questions.
 <?php
 class Entity
 {
-    private $valid;       // NOT $isValid
-    private $checkNeeded; // NOT $check
+    private bool $valid;       // NOT $isValid
+    private bool $checkNeeded; // NOT $check
 }
 ```
 
@@ -410,17 +475,17 @@ We always make correct English phrase from method names, this is more important 
 <?php
 interface EntityInterface
 {
-    public function isValid();
-    public function isCheckNeeded();
-    public function getSomeValue();
-    public function canBeChecked();
-    public function areTransactionsIncluded();
+    public function isValid(): bool;
+    public function isCheckNeeded(): bool;
+    public function getSomeValue(): string;
+    public function canBeChecked(): bool;
+    public function areTransactionsIncluded(): bool;
 
     // WRONG:
-    public function isCheck();
-    public function isNeedsChecking();
-    public function isTransactionsIncluded();
-    public function getIsValid();
+    public function isCheck(): bool;
+    public function isNeedsChecking(): bool;
+    public function isTransactionsIncluded(): bool;
+    public function getIsValid(): bool;
 }
 ```
 
@@ -428,15 +493,12 @@ interface EntityInterface
 <?php
 interface ControllerInterface
 {
-    /**
-     * @return boolean
-     */
-    public function canAccess($groupId);
+    public function canAccess(int $groupId): bool;
 
     /**
      * @throws AccessDeniedException
      */
-    public function checkPermissions($groupId);
+    public function checkPermissions(int $groupId): void;
 }
 ```
 
@@ -503,9 +565,6 @@ namespace Some\Namespace;
 
 // ...
 
-/**
- * @var \Vendor\Namespace\Entity\Value $value
- */
 public function setSomething(\Vendor\Namespace\Entity\Value $value);
 ```
 
@@ -518,9 +577,6 @@ namespace Some\Namespace;
 
 use Vendor\Namespace\Entity\Value;
 
-/**
- * @var Value $value
- */
 public function setSomething(Value $value);
 ```
 
@@ -534,9 +590,9 @@ Do **not** do this:
 
 ```php
 <?php
-$a = $d && $e ? false : true;
+$alpha = $delta && $gamma ? false : true;
 
-if ($a && $b) {
+if ($alpha && $beta) {
     return true;
 }
 
@@ -547,9 +603,9 @@ Do this:
 
 ```php
 <?php
-$a = !($d && $e);
+$alpha = !($delta && $gamma);
 
-return $a && $b;
+return $alpha && $beta;
 ```
 
 ### Logical operators
@@ -630,9 +686,15 @@ When comparing to `null`, we always compare explicitly.
 ```php
 <?php
 
-function func(ValueClass $value = null)
+function func(?ValueClass $value = null): ?string
 {
     return $value !== null ? $value->getSomething() : null;
+}
+
+//or in php8
+function func(?ValueClass $value = null): ?string
+{
+    return $value?->getSomething();
 }
 ```
 
@@ -648,8 +710,8 @@ Wrong:
 
 ```php
 <?php
-if (($b = $a->get()) !== null && ($c = $b->get()) !== null) {
-    $c->do();
+if (($beta = $alpha->get()) !== null && ($gamma = $beta->get()) !== null) {
+    $gamma->do();
 }
 if ($project = $this->findProject()) {
 
@@ -660,11 +722,11 @@ Correct:
 
 ```php
 <?php
-$b = $a->get();
-if ($b !== null) {
-    $c = $b->get();
-    if ($c !== null) {
-        $c->do();
+$beta = $alpha->get();
+if ($beta !== null) {
+    $gamma = $beta->get();
+    if ($gamma !== null) {
+        $gamma->do();
     }
 }
 
@@ -687,19 +749,7 @@ Wrong:
 ```php
 <?php
 
-function find($needle, $haystack)
-{
-    $found = false;
-    foreach ($haystack as $item) {
-        if ($needle === $item) {
-            $found = true;
-            break;
-        }
-    }
-    return $found;
-}
-
-function getSomething()
+function getSomething(): string
 {
     $a = get();
     return $a;
@@ -711,17 +761,7 @@ Correct:
 ```php
 <?php
 
-function find($needle, $haystack)
-{
-    foreach ($haystack as $item) {
-        if ($needle === $item) {
-            return true;
-        }
-    }
-    return false;
-}
-
-function getSomething()
+function getSomething(): string
 {
     return get();
 }
@@ -733,11 +773,11 @@ this way of variable usage is fine:
 ```php
 <?php
 
-function canModify($object)
+function canModify(ValueClass $object): bool
 {
     $rightsGranted = isAdmin() || isOwner($object);
     $objectEditable = isNew($object) && !isLocked($object);
-    
+
     return $rightsGranted && $objectEditable;
 }
 
@@ -754,16 +794,16 @@ Instead, in both cases, we create new variable with different name.
 ```php
 <?php
 
-public function thisIsWrong($number, $text, Request $request)
+public function thisIsWrong(int $number, string $text, Request $request): void
 {
-    $number = (int)$number;  // Illegal: we 1) change argument value 2) change it's type
+    $number = (string)$number;  // Illegal: we 1) change argument value 2) change it's type
     $text .= ' ';  // Illegal: we change argument value
     $document = $request->get('documentId');
     $document = $this->repository->find($document); // Illegal: we change variable's type
     // ...
 }
 
-public function thisIsCorrect($numberText, $text, Request $request)
+public function thisIsCorrect(string $numberText, string $text, Request $request): void
 {
     $number = (int)$numberText;
     $modifiedText = $text . ' ';
@@ -803,11 +843,7 @@ if ($first && $second) {
 ### Static methods
 
 We do use static methods only in these cases:
-
--   to create an entity for fluent interface, if PHP version in the project is lower thant 5.4.
-We use `(new Entity())->set('a')` in 5.4 or above
-
--   to give available values for some field of an entity, used in validation
+-   `dataProvider` in phpunit 10
 
 ### Converting to string
 
@@ -840,11 +876,10 @@ Example:
 ```php
 <?php
 class A {
-    private $a;      // this must be defined as a property
-    public $b;       // this is illegal
-    public static $availableValues = ['a', 'b'];       // this is illegal
+    private int $a;      // this must be defined as a property
+    public int $b;       // this is illegal
 
-    public function __construct($a)
+    public function __construct(int $a)
     {
         $this->a = $a;
     }
@@ -875,26 +910,9 @@ if ($result === null) {
     // ...
 ```
 
-### `str_replace`
+### String manipulation
 
-We do not use `str_replace` if we need to remove prefix or suffix - this can lead to replacing more
-content unintentionally.
-
-```php
-<?php
-function removePrefix($text, $prefix)
-{
-    if (substr($text, 0, strlen($prefix)) === $prefix) { // strpos === 0 is also possible
-        $text = substr($text, strlen($prefix));
-    }
-    return $text;
-}
-
-assertSame('Some asd text', removePrefix('asdSome asd text', 'asd'));
-```
-
-We can also use `preg_replace` for this.
-
+We use `trim, ltrim, rtrim` or whatever is more modern prefix and suffix removal.
 ### Return and argument types
 
 #### Return types
@@ -905,7 +923,7 @@ For example, we can*not* return `boolean|string` or `SuccessResult|FailureResult
 (if `SuccessResult` and `FailureResult` has no common class or interface; if they do, we document to return that
 interface instead).
 
-We can return `SomeClass|null` or `string|null`.
+We can return `?SomeClass` or `?string`.
 
 Note: when we are always returning the same class but it's iterable of other classes, we can (and should)
 provide `Collection|SomeClass[]|null` as return value.
@@ -937,9 +955,9 @@ Example:
 
 class Service
 {
-    public function __construct(SomeService $s, LoggerInterface $logger = null)
+    public function __construct(SomeService $s, ?LoggerInterface $logger = null)
     {
-
+        //...
     }
 }
 ```
@@ -949,36 +967,16 @@ class Service
 
 class Entity
 {
-    /**
-     * @param ValueClass|null $value
-     */
-    public function setValue(ValueClass $value = null)
+    public function setValue(?ValueClass $value): self
     {
-
+        //...
+        return $this;
     }
 }
 
 $entity->setValue($someValue);
 $entity->setValue(null);
 // but we do not use $entity->setValue();
-```
-
-For PHP 7.1 and above, we must use nullable type hints instead:
-
-```php
-
-<?php
-
-class Entity
-{
-    /**
-     * @param ValueClass|null $value
-     */
-    public function setValue(?ValueClass $value)
-    {
-
-    }
-}
 ```
 
 #### Void result
@@ -992,13 +990,13 @@ Wrong:
 
 ```php
 <?php
-function makeSomething()
+function makeSomething(): bool
 {
     if (success()) {
         return true;
     }
 }
-function getValue(MyObject $object)
+function getValue(MyObject $object): string
 {
     if (!$object->has()) {
         return;
@@ -1008,7 +1006,7 @@ function getValue(MyObject $object)
 /**
  * @throws PaybackUnavailableException
  */
-function payback($requestId)
+function payback(int $requestId): bool
 {
     makePayback($requestId);
     return true;
@@ -1019,14 +1017,14 @@ Correct:
 
 ```php
 <?php
-function makeSomething()
+function makeSomething(): ?bool
 {
     if (success()) {
         return true;
     }
     return null;
 }
-function getValue(MyObject $object)
+function getValue(MyObject $object): ?string
 {
     if (!$object->has()) {
         return null;
@@ -1036,7 +1034,7 @@ function getValue(MyObject $object)
 /**
  * @throws PaybackUnavailableException
  */
-function payback($requestId)
+function payback($requestId): void
 {
     makePayback($requestId);
 }
@@ -1058,62 +1056,28 @@ This also applies for typehints in PhpDoc of properties.
 Examples:
 ```php
 <?php
- 
-declare(strict_types=1);
- 
-class SomeClass
-{
-    /**
-     * @var int|null    –> this must include `|null`, as `$id` can be uninitialized 
-     */
-    private $id;
- 
-    public function getId(): ?int   // return value here must be nullable 
-    {
-        return $this->id;
-    }
- 
-    /**
-     * @return int|null
-     */
-    public function getIdBefore71() 
-    {
-        return $this->id;
-    }
- 
-    public function setId(int $id): self    // we can use non-nullable type for setter, though
-    {
-        $this->id = $id;
-         
-        return $this;
-    }
-}
-```
 
-```php
-<?php
- 
 declare(strict_types=1);
- 
+
 class SomeClass
 {
-    /**
-     * @var Child|null 
-     */
-    private $child;
- 
-    public function getChild(): Child
+    private array $array;
+
+    public function __construct()
     {
-        if ($this->child === null) {
-            throw new RuntimeException('child is not initialized yet');
-        }
-        
-        return $this->child;
+        $this->array = [];
     }
- 
-    public function hasChild(): bool
+
+    public function getId(): array
     {
-        return $this->child !== null;
+        return $this->array;
+    }
+
+    public function setId(array $array): self
+    {
+        $this->array = $array;
+
+        return $this;
     }
 }
 ```
@@ -1221,7 +1185,7 @@ as we do not want to check whether `$array` is `0`, `false`, `''` or even not de
 If we need to call parent constructor, we do it as first statement in constructor. For example:
 
 ```php
-public function __construct($arg1, $arg2)
+public function __construct(int $arg1, int $arg2)
 {
     parent::__construct($arg1);
     $this->setArg2($arg2);
@@ -1236,12 +1200,15 @@ public function __construct($arg1, $arg2)
 Example of parent class, with which calling constructor later would fail:
 
 ```php
-protected $params;
-public function __construct($arg1)
+/**
+ * @var int[] $params
+ */
+protected array $params;
+public function __construct(int $arg1)
 {
     $this->params = [$arg1];
 }
-public function setArg2($arg2)
+public function setArg2(int $arg2)
 {
     $this->params[] = $arg2;
 }
@@ -1269,45 +1236,23 @@ If we need to define some default value for class property, we do this in constr
 ```php
 class MyClass
 {
-    const TYPE_TWO = 'two';
- 
-    /**
-     * @var ArrayCollection
-     */
-    private $one;
- 
-    /*
-     * @var string
-     */
-    private $two;
- 
-    /*
-     * @var int
-     */
-    private $three;
- 
-    /*
-     * @var bool
-     */
-    private $four;
- 
-    /*
-     * @var SomeObject
-     */
-    private $five;
- 
-    /*
-     * @var \DateTime
-     */
-    private $createdAt;
- 
+    private const TYPE_TWO = 'two';
+
+    private ArrayCollection $one;
+    private string $two;
+    private int $three;
+    private bool $four;
+    private SomeObject $five;
+
+    private DateTimeImmutable $createdAt;
+
     public function __construct()
     {
         $this->one = new ArrayCollection();
         $this->two = self::TYPE_TWO;
         $this->three = 3;
         $this->four = false;
-        $this->createdAt = new \DateTime();
+        $this->createdAt = new DateTimeImmutable();
     }
 }
 ```
@@ -1323,10 +1268,10 @@ It's safer to type-cast variables in the file to the correct scalar types to kee
 
 #### Always use scalar typehints where appropriate
 
-We always use scalar typehints both for arguments and return types, unless our code with them would not work 
+We always use scalar typehints both for arguments and return types, unless our code with them would not work
 as intended so we are forced not to use them.
 
-For already existing methods we can add scalar typehints but we're responsible to guarantee that any place 
+For already existing methods we can add scalar typehints but we're responsible to guarantee that any place
 in the project that has strict types declaration and calls this method always passes the correct type as an argument.
 We could add typecast in the places where we're not guaranteed to keep the consistent behavior.
 
@@ -1335,49 +1280,17 @@ Scalar typehints can be always safely added to return values if needed, though.
 
 ```php
 <?php
- 
-declare(strict_types=1); // this is required for new files
- 
+
+declare(strict_types=1);
+
 class Something
 {
-    /**
-     * @var int|null
-     */
-    private $b;
- 
-    public function increment(int $a): int //if we can declare it, we declare types both for arguments and return type
+    public function increment(int $alpha): int
     {
-        return $a + 1;
-    }
- 
-    public function setBPhp70Style(int $b = null): self //PHP 7.0 only
-    {
-        $this->b = $b;
- 
-        return $this;
-    }
- 
-    public function setBPhp71AndUpStyle(?int $b): self //PHP 7.1 and up
-    {
-        $this->b = $b;
- 
-        return $this;
-    }
- 
-    /**
-     * @return int|null
-     */
-    public function getBPhp70Style() //We can not provide nullable return type hint in PHP 7.0
-    {
-        return $this->b;
-    }
- 
-    public function getBPhp71AndUpStyle(): ?int //PHP 7.1 and up supports nullable types so we use them
-    {
-        return $this->b;
+        return $alpha + 1;
     }
 }
- 
+
 // some old interface from some old library we have to implement
 interface SomeOldInterface
 {
@@ -1387,7 +1300,7 @@ interface SomeOldInterface
      */
     public function doOldStuff($withSomething);
 }
- 
+
 class OurShinyNewClass implements SomeOldInterface
 {
     /**
@@ -1398,20 +1311,6 @@ class OurShinyNewClass implements SomeOldInterface
     {
         return [];
     }
-     
-    /**
-     * @param Result[] $results
-     * @return int[]
-     */
-    public function getSomeIntProperty(array $results): array
-    {
-        return array_map(
-            function (Result $result): int {
-                return $result->getSomeIntProperty();
-            },
-            $results
-        );
-    }
 }
 ```
 
@@ -1421,19 +1320,14 @@ For functions and methods that do not return value, we should typehint return va
 
 ```php
 <?php
- 
+
 declare(strict_types=1);
- 
+
 class SomeClass
 {
     public function doSomething(): void // we must typehint return value as `void` here as method does not return anything
     {
         echo "Hi!";
-    }
- 
-    public function returnMixed() // no typehint will be used only for cases where we do not guarantee some exact return type
-    {
-        return $_GET['something'];
     }
 }
 ```
@@ -1443,10 +1337,6 @@ class SomeClass
 ### PhpDoc on methods
 
 #### No PhpDoc on fully strictly typed methods
-
-We put a PhpDoc comment on methods where the return and argument types are not type-hinted in the method signature. For 
-example, prior to PHP 7.0, we would need a PhpDoc to type-hint scalar types. In PHP 7, the scalar types would be 
-strictly typed and PhpDoc is not needed.
 
 If PhpDoc does not add any other information that's already provided with typehints, we don't use PhpDoc at all.
 
@@ -1467,10 +1357,7 @@ Correct:
 ```php
 public function getLimit(Client $client, string $type): Money;
 
-/**
- * @param int $number
- */
-public function setNumber($number);
+public function setNumber(int $number): self;
 ```
 
 > **Why?** Any comment needs to be maintained – if we add parameter, change parameter or return type, we must also update the PhpDoc. If PhpDoc does not add any additional information, it just duplicates information that's already provided.
@@ -1495,34 +1382,17 @@ public function getDayLimit(Client $client): Money;
 
 #### PhpDoc on arrays
 
-When we take as an argument or return an array of strictly typed elements, we should add a PhpDoc to describe the 
+When we take as an argument or return an array of strictly typed elements, we should add a PhpDoc to describe the
 type of elements in the array.
 
 ```php
 /**
- * @param Client[]|array $clients
+ * @param Client[] $clients
  *
  * @return Money
  */
 public function getDayLimitForClients(array $clients): Money;
 ```
-
-#### PhpDoc on nullable return types
-
-A full PhpDoc is required when at least one of the parameters or the return type is not strictly typed:
-```php
-/**
- * @param Client $client
- *
- * @return Money|null
- */
-public function getDayLimit(Client $client);
-```
-
-Starting with PHP 7.1, nullable return types can be type-hinted in the code, so PhpDoc is not necessary:
-```php
-public function getDayLimit(Client $client): ?Money;
-``` 
 
 ### PhpDoc contents
 
@@ -1561,7 +1431,7 @@ we provide all of them separated by `|`.
  *
  * @return SomeObject[]|Collection|null Optional description of return type
  */
-public function getSomething($param1)
+public function getSomething(string $param1)
 {
     // ...
     return $collection;
@@ -1629,15 +1499,18 @@ Some examples:
 class NewsletterSender
 {
     /**
-     * @var MailFactory this must be multiline - 3 lines, not 1
+     * @var ProcessorInterface[] this must be multiline - 3 lines, not 1
      */
-    private $mailFactory;
-    
-    public function sendNewsletter(Newsletter $newsletter)
+    private $processors;
+
+    public function sendNewsletter(Newsletter $newsletter): void
     {
-        /** @var Mail $mail this must be single line - 1 line, not 3 */
-        $mail = $this->mailFactory->createNamedMail($newsletter->getName());
-        
+        foreach ($this->processors as $processor) {
+            /** @var Mail $mail this must be single line - 1 line, not 3 */
+            $mail = $processor->createNamedMail($newsletter->getName());
+            //..
+        }
+
         // we can add single line comments to explain behavior
     }
 }
@@ -1682,12 +1555,14 @@ Instead of:
 <?php
 class BadExample
 {
-    protected $name;
-    public function setManagerName($name)
+    protected string $name;
+    public function setManagerName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
     }
-    public function search()
+    public function search(): void
     {
         // do something with $this->name
     }
@@ -1700,7 +1575,7 @@ we use:
 <?php
 class GoodExample
 {
-    public function search($managerName)
+    public function search(string $managerName): void
     {
         // ...
     }
@@ -1737,22 +1612,22 @@ For example, instead of:
 ```php
 class ServiceA
 {
-    public function doSomething()
+    public function doSomething(): void
     {
-        $a = Manager::getInstance();
-        $a->doSomething('a');
+        $alpha = Manager::getInstance();
+        $alpha->doSomething('a');
     }
 }
 class ServiceB
 {
-    public function doSomething()
+    public function doSomething(): void
     {
-        $a = Manager::getInstance();
-        $a->doSomething('b');
+        $alpha = Manager::getInstance();
+        $alpha->doSomething('b');
     }
 }
-$a = new ServiceA();
-$b = new ServiceB();
+$alpha = new ServiceA();
+$beta = new ServiceB();
 ```
 
 we use:
@@ -1760,18 +1635,18 @@ we use:
 ```php
 class Service
 {
-    private $manager;
+    private Manager $manager;
     public function __construct(Manager $manager)
     {
         $this->manager = $manager;
     }
-    public function doSomething()
+    public function doSomething(): void
     {
         $this->manager->doSomething();
     }
 }
-$a = new Service(new Manager('a')); // we use Dependency Injection Container for creating services, this is just an example
-$b = new Service(new Manager('b'));
+$alpha = new Service(new Manager('a')); // we use Dependency Injection Container for creating services, this is just an example
+$beta = new Service(new Manager('b'));
 ```
 
 This allows to reuse already tested code in different scenarios just by reconfiguring it.
@@ -1839,13 +1714,13 @@ no `switch` statements, event maps, complex validation rules, nested \`if\`s or 
 class Manager
 {
     // simple short methods with clear logic:
-    public function accept(Request $request)
+    public function accept(Request $request): void
     {
         $this->assertPending($request);
         $request->setStatus(Request::STATUS_ACCEPTED);
         $this->eventDispatcher->dispatch(RequestEvents::ACCEPTED, new RequestEvent($request));
     }
-    public function deny(Request $request)
+    public function deny(Request $request): void
     {
         $this->assertPending($request);
         $request->setStatus(Request::STATUS_DENY);
@@ -1853,7 +1728,7 @@ class Manager
     }
 
     // more complicated and totally unclear from interface
-    public function changeStatus(Request $request, $status)
+    public function changeStatus(Request $request, string $status): void
     {
         $this->assertPending($request);
         switch ($status) {
@@ -1903,13 +1778,13 @@ If we do not find object by identifier, we throw exception and return `404` as a
 #### Date and time
 
 In some cases we use integer UNIX timestamp to represent date with time.
-When creating `\DateTime`, we must not use constructor with `@` as it ignores the time zone of the server.
+When creating `DateTimeImmutable`, we must not use constructor with `@` as it ignores the time zone of the server.
 
 For example:
 
 ```php
 <?php
-$createdAt = new \DateTime();
+$createdAt = new DateTimeImmutable();
 $createdAt->setTimestamp($data['created_at']);
 $entity->setCreatedAt($createdAt);
 ```
@@ -1937,15 +1812,24 @@ Example:
 ```php
 class Manager
 {
+    /**
+     * @var ProviderInterface[]
+     */
     protected $providers = [];
-    public function addProvider(ProviderInterface $provider, $providerKey)
+
+    public function addProvider(ProviderInterface $provider, string $providerKey): self
     {
         $this->providers[$providerKey] = $provider;
+
+        return $this;
     }
 
-    public function doSomething(Data $data)
+    public function doSomething(Data $data): string
     {
-        // todo: check if provider with such key exists
+        if (!isset($this->providers[$data->getProviderKey()])) {
+            throw new RuntimeException();
+        }
+
         return $this->providers[$data->getProviderKey()]->doSomething($data);
     }
 }
@@ -2011,7 +1895,7 @@ in plain-text.
 This chapter describes conventions related directly with Symfony framework and related components (Doctrine, Twig).
 
 It also includes some closely related conventions that can be used independently (for example in libraries).
-    
+
 ## Configuration
 
 ### Configuration inside bundles
@@ -2201,7 +2085,7 @@ This allows others to use autowiring features if needed, even if we don't use th
 We should only use this for public services - ones that are to be used outside of our bundle.
 
 Exception: for controllers we use classname as service ID.
-> **Why?** Because routing annotations work only when controller's service ID is it's classname 
+> **Why?** Because routing annotations work only when controller's service ID is it's classname
 > (otherwise it has no way to know it).
 
 #### Autoconfiguration and autowiring
@@ -2258,20 +2142,25 @@ $container->get('my_prefix.' . $type . '.provider');
 Instead do this:
 
 ```php
-public function addProvider(SomeInterface $provider, $type)
+public function addProvider(SomeInterface $provider, string $type): self
 {
     $this->providers[$type] = $provider;
+
+    return $this;
 }
 
-public function getProvider($type)
+public function getProvider(string $type): ProviderInterface
 {
-    // todo: throw if missing or return null
+    if (!isset($this->providers[$type])) {
+        throw new RuntimeException();
+    }
+
     return $this->providers[$type];
 }
 
 // ...
 
-public function build(ContainerBuilder $container)
+public function build(ContainerBuilder $container): void
 {
     $container->addCompilerPass(new AddTaggedCompilerPass(
         'my_prefix.my_registry',
@@ -2407,9 +2296,9 @@ $user->getEmails();  // this will also return *only* active emails, as the user 
 What are the options?
 
 1) change `->select('c, a')` to `->select('c')`, so we do not pre-fetch accounts;
-2) pre-fetch them with a separate join:  
+2) pre-fetch them with a separate join:
 Keep in mind that pre-fetching is OK and recommended in most of the cases where we will use those relations.
-It's just not good if we also filter by that relation.  
+It's just not good if we also filter by that relation.
 Further work and filtering should still be done within the code as results will contain users with at least one active email, but won't have users which all emails are not active - in other words we filter out users without active emails.
 ```php
 <?php
@@ -2433,7 +2322,7 @@ foreach ($users as $user) {
     }
 }
 ```
-3) select only those fields which are relevant for you within that specific case:  
+3) select only those fields which are relevant for you within that specific case:
 Entities won't be resolved, plain array would be returned, hence Doctrine's identity map is not built.
 ```php
 $result = $this->createQueryBuilder('user')
@@ -2495,7 +2384,7 @@ In this case `set*` contains code to reset collection and `add*` every item in p
 <?php
 class Tree
 {
-    private $leaves;
+    private ArrayCollection $leaves;
 
     public function __construct()
     {
@@ -2506,19 +2395,21 @@ class Tree
      * @param Leaf[] $leaves we do not typecast to array or Collection as this can be any iterable
      * @return $this
      */
-    public function setLeaves($leaves)
+    public function setLeaves(arrray $leaves): self
     {
         $this->leaves->clear();
         foreach ($leaves as $leaf) {
             $this->addLeaf($leaf);
         }
+
         return $this;
     }
 
-    public function addLeaf(Leaf $leaf)
+    public function addLeaf(Leaf $leaf): self
     {
         $this->leaves[] = $leaf;
         $leaf->setTree($this);
+
         return $this;
     }
 }
@@ -2536,11 +2427,11 @@ Constant name starts with property name, followed by the value itself.
 <?php
 class Entity
 {
-    const TYPE_SIMPLE = 'simple';
-    const TYPE_COMPLICATED = 'complicated';
+    public const TYPE_SIMPLE = 'simple';
+    public const TYPE_COMPLICATED = 'complicated';
 
-    private $type;
-    
+    private string $type;
+
     public function __construct()
     {
         $this->type = self::TYPE_SIMPLE;
@@ -2605,15 +2496,15 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class FooProcessor
 {
-    protected $entityManager;
-    protected $remoteServiceClient;
+    protected EntityManagerInterface $entityManager;
+    protected RemoteServiceClient $remoteServiceClient;
 
     public function __construct(EntityManagerInterface $entityManager, RemoteServiceClient $remoteServiceClient)
     {
         $this->entityManager = $entityManager;
     }
 
-    public function process()
+    public function process(): void
     {
         $foo = new Foo('name');
         $createdFoo = $this->remoteServiceClient->createFoo($foo);
@@ -2665,7 +2556,7 @@ We avoid SQL keywords in table and column names, but leave them as-is in PHP-sid
 <?php
 class Entity
 {
-    private $key;
+    private string $key;
 }
 ```
 
@@ -2677,7 +2568,7 @@ class Entity
 
 We avoid Doctrine class-map and extending entities.
 
-> **Why?** 
+> **Why?**
 > 1) Extending comes with very bad performance (many relations are queried automatically even if they are
 > never used afterwards), and many `instanceof` checks in the code;
 > 2) this is not extendable, as base bundle must know about all others extending it’s entity;
@@ -2751,13 +2642,16 @@ We store only it's internal fields and recreate it when needed. This makes the c
 
 class Entity
 {
-    private $priceAmount;
-    private $priceCurrency;
+    private ?string $priceAmount;
+    private ?string $priceCurrency;
 
-    /**
-     * @var Money|null $price
-     */
-    public function setPrice(Money $price = null)
+    public function __construct()
+    {
+        $this->priceAmount = null;
+        $this->priceCurrency = null;
+    }
+
+    public function setPrice(?Money $price = null)
     {
         if ($price === null) {
             $this->priceAmount = null;
@@ -2768,7 +2662,7 @@ class Entity
         }
     }
 
-    public function getPrice()
+    public function getPrice(): ?Money
     {
         return $this->priceAmount !== null && $this->priceCurrency !== null
             ? new Money($this->priceAmount, $this->priceCurrency)
@@ -2847,9 +2741,6 @@ WHERE e0_.object_id = '21590'
 ORDER BY e0_.version DESC;
 ```
 
-For PHP 7.0 and above, we might require that correct type (`string` in this case) would be passed as an argument.
-For lower PHP versions, we could cast an argument when passing to query.
-
 ## Controllers
 
 ### As services
@@ -2873,7 +2764,7 @@ We pass original representation of variables to view, if view can itself transfo
 <?php
 class Controller
 {
-    public function action()
+    public function action(): Response
     {
         // ...
         return $this->render($template, array(
@@ -2936,7 +2827,7 @@ We give constant the same value as the constant name, prefixed with bundle name.
 <?php
 final class PageEvents
 {
-    const PAGE_CREATED = 'evp_page.page_created';
+    public const PAGE_CREATED = 'evp_page.page_created';
 }
 ```
 
@@ -2956,7 +2847,7 @@ Wrong:
 <?php
 class PageCreatedEvent extends Event
 {
-    private $page;
+    private Page $page;
 }
 ```
 
@@ -2966,18 +2857,18 @@ Correct:
 <?php
 class PageEvent extends Event
 {
-    private $page;
+    private Page $page;
 }
 ```
 
-Also correct:
+Correct, because it has special case of additional property:
 
 ```php
 <?php
 class PageChangedEvent extends Event
 {
-    private $page;
-    private $previousPage;
+    private Page $page;
+    private Page $previousPage;
 }
 ```
 
@@ -3024,7 +2915,7 @@ PageBlock/MenuProvider.php
 
 We don't use `\Bundle\` sub-namespace after the vendor for new projects - we use `Vendor\SomeBundle` directly.
 
-In existing projects we make folder structure the same as it's already used there.  
+In existing projects we make folder structure the same as it's already used there.
 
 ### Example
 
@@ -3084,7 +2975,7 @@ If command name consists of several words, we use dashes to separate them. For e
 
 We register commands as services with dependencies injected into them.
 
-We use lazy loading by always providing attribute with command name in the tag ([see documentation](https://symfony.com/doc/3.4/console/commands_as_services.html#lazy-loading)).
+We use lazy loading by always providing attribute with command name in the tag ([see documentation](https://symfony.com/doc/current/console/lazy_commands.html)).
 
 ## Symfony version and new projects
 
@@ -3099,20 +2990,10 @@ We prefer LTS version of Symfony framework as it does not require much maintenan
 We can use, if applicable, newer stable version of Symfony, but we must update it periodically (more often than LTS)
 so that it would still be supported (even if we don't actively maintain that project, so choose carefully).
 
-We prefer to use only 2 different major versions of Symfony for our projects. For example:
-
-* let's say that currently Symfony 3.4 is newest LTS version of Symfony. Symfony 4.1 is stable, but not LTS version.
-Symfony 2.8 is older LTS version and is still supported;
-* some projects are still ran on Symfony 2.8 version;
-* we are migrating these projects to Symfony 3.4, some projects are already using it;
-* we avoid using Symfony 4.1 for new projects (or avoid updating current projects to this version) as this would make
-3 different major versions in use;
-* when all the projects are updated to Symfony 3.4, we could update our project to use Symfony 4.1 (even non-LTS) or
-use this for new projects.
+We prefer to use only 2 different major versions of Symfony for our projects.
 
 > **Why not using 3 different major versions?** This would make quite hard to maintain several Symfony versions in
-> our libraries and bundles. If we would drop 2.x support (to support only 3.x and 4.x), this would make difficult
-> to correct some bug or add improvement to those projects that still use 2.x version.
+> our libraries and bundles.
 
 ### Configuration
 
@@ -3140,7 +3021,7 @@ We can use plain normalizer or plain item normalizer if needed.
 
 We use result provider to give `Result` entities from REST controller.
 
-Response is automatically normalized using normalizer related to the classname of the returned object. 
+Response is automatically normalized using normalizer related to the classname of the returned object.
 We could override it with additional annotation, if needed.
 
 ### Extending model
@@ -3155,22 +3036,22 @@ On the server side:
 <?php
 class MainEntity
 {
-    protected $id;
-    protected $type;
+    protected int $id;
+    protected string $type;
 }
 
 class SubEntity
 {
-    protected $id;
-    protected $mainEntity;
-    protected $subValue;
+    protected int $id;
+    protected MainEntity $mainEntity;
+    protected string $subValue;
 }
 
 class AnotherSubEntity
 {
-    protected $id;
-    protected $mainEntity;
-    protected $anotherSubValue;
+    protected int $id;
+    protected MainEntity $mainEntity;
+    protected string $anotherSubValue;
 }
 ```
 
@@ -3180,10 +3061,10 @@ On the client side:
 <?php
 class Entity
 {
-    protected $id;
-    protected $type;
-    protected $subValue;
-    protected $anotherSubValue;
+    protected int $id;
+    protected string $type;
+    protected string $subValue;
+    protected string $anotherSubValue;
 }
 ```
 
@@ -3193,15 +3074,15 @@ OR
 <?php
 class Entity
 {
-    protected $id;
+    protected int $id;
 }
 class SubEntity extends Entity
 {
-    protected $subValue;
+    protected string $subValue;
 }
 class AnotherSubEntity extends Entity
 {
-    protected $anotherSubValue;
+    protected string $anotherSubValue;
 }
 ```
 
@@ -3286,7 +3167,7 @@ namespace Acme\NewsletterBundle\Service;
 
 class NewsletterSender
 {
-    public function sendNewsletter(Newsletter $newsletter)
+    public function sendNewsletter(Newsletter $newsletter): void
     {
         $userId = $newsletter->getUserId();
         $userData = get_user_data($userId); // don't do this! ;)
@@ -3319,47 +3200,27 @@ namespace Acme\NewsletterBundle\Entity;
 
 class UserData
 {
-    /**
-    * @var string
-    */
-    private $email;
-    
-    /**
-    * @var string
-    */
-    private $name;
+    private string $email;
+    private string $name;
 
-    /**
-     * @return string
-     */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
 
-    /**
-     * @param string $email
-     * @return $this
-     */
-    public function setEmail($email)
+    public function setEmail(string $email): self
     {
         $this->email = $email;
+
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     * @return $this
-     */
-    public function setName($name)
+    public function setName(string $name): self
     {
         $this->name = $name;
         return $this;
@@ -3376,14 +3237,14 @@ namespace Acme\NewsletterBundle\Service;
 
 class NewsletterSender
 {
-    private $userDataProvider;
-    
+    private UserDataProviderInterface $userDataProvider;
+
     public function __construct(UserDataProviderInterface $userDataProvider)
     {
         $this->userDataProvider = $userDataProvider;
     }
-    
-    public function sendNewsletter(Newsletter $newsletter)
+
+    public function sendNewsletter(Newsletter $newsletter): void
     {
         $userData = $this->userDataProvider->getUserData($newsletter->getUserId());
         $userEmail = $userData->getEmail();
@@ -3408,7 +3269,7 @@ use Acme\NewsletterBundle\Service\UserDataProviderInterface;
 
 class UserDataProvider implements UserDataProviderInterface
 {
-    public function getUserData($userId): UserData
+    public function getUserData(int $userId): UserData
     {
         $userData = get_user_data($userId);
         if ($userData === false) {
@@ -3440,7 +3301,7 @@ namespace Acme\NewsletterBundle\DependencyInjection;
 
 class Configuration implements ConfigurationInterface
 {
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('acme_newsletter');
@@ -3460,7 +3321,7 @@ namespace Acme\NewsletterBundle\DependencyInjection;
 
 class AcmeNewsletterExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
@@ -3527,9 +3388,9 @@ We tag each and every commit (except instant bug-fixes or commits before separat
     (or parent commit if there are few active branches).
 
     3.1. If we make backward incompatible change, we bump the MAJOR version.
-    
+
     3.2. If we add new feature (any new arguments, method calls, classes etc.), we bump MINOR version.
-    
+
     3.3. If we do not change API of library in any way, just change the internals (usually bug-fixes),
          we bump PATCH version.
 
@@ -3540,14 +3401,14 @@ git tag -a -m "" 1.2.3
 ```
 
 `-m ""` sets message to the tag, but as all commits are already with messages, we can leave it empty.
- 
+
 After tagging we need to call `git push --tags` - this pushes our tags to origin. We only do this after we've
 landed our changes.
 
 ## Reviewing tagging policy
 
 The tagging policy is always visible in `CHANGELOG.md` file - we don't use `Unreleased` block for internal libraries
-that are updated for some concrete purpose (to be updated right afterwards in another project). 
+that are updated for some concrete purpose (to be updated right afterwards in another project).
 
 It's important to keep it updated and in-sync if any other changes are made in master after our diff - one should
 be careful when rebasing this file.
@@ -3601,4 +3462,27 @@ If vendor library has no versions defined, we require specific commit:
 
 ```
 "vendor/package": "dev-master#8e45af93e4dc39c22effdc4cd6e5529e25c31735"
+```
+
+## Library version incrementing
+As long as public API does not change, but dependency of library is not backward compatible anymore its still minor change
+
+Example:
+```
+//Was:
+//...
+"require": {
+    "php": "^7.4",
+},
+"lib-version": "1.2.3"
+//...
+
+//Becomes:
+//...
+"require": {
+    "php": "^8.2",
+},
+"lib-version": "1.2.4"
+//...
+
 ```
