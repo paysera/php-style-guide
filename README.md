@@ -875,13 +875,13 @@ Example:
 
 ```php
 <?php
-class A {
-    private int $a;      // this must be defined as a property
-    public int $b;       // this is illegal
+class Alpha {
+    private int $alpha;      // this must be defined as a property
+    public int $beta;       // this is illegal
 
-    public function __construct(int $a)
+    public function __construct(int $alpha)
     {
-        $this->a = $a;
+        $this->alpha = $alpha;
     }
 }
 ```
