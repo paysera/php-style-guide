@@ -70,7 +70,6 @@ releasing libraries or requiring ones.
       - [Passing ID](#passing-id)
       - [Type-hinting optional arguments](#type-hinting-optional-arguments)
       - [Void result](#void-result)
-      - [Correct typehinting for possibly uninitialized properties](#correct-typehinting-for-possibly-uninitialized-properties)
     - [Type-hinting classes and interfaces](#type-hinting-classes-and-interfaces)
       - [Dependencies with several interfaces](#dependencies-with-several-interfaces)
     - [Dates](#dates)
@@ -1044,45 +1043,6 @@ function payback($requestId): void
 > is indeed taken into account. For example, return `false` on failure, even if this failure is not handled anyhow by
 > the functionality that's calling your method.
 
-#### Correct typehinting for possibly uninitialized properties
-
-If we declare some class property type as not nullable, after that class object construction
-it should never be or become null.
-
-To rephrase from other perspective – if property is not initialized in the constructor, it's type must be nullable.
-
-This also applies for typehints in PhpDoc of properties.
-
-Examples:
-```php
-<?php
-
-declare(strict_types=1);
-
-class SomeClass
-{
-    private array $array;
-
-    public function __construct()
-    {
-        $this->array = [];
-    }
-
-    public function getId(): array
-    {
-        return $this->array;
-    }
-
-    public function setId(array $array): self
-    {
-        $this->array = $array;
-
-        return $this;
-    }
-}
-```
-
-
 ### Type-hinting classes and interfaces
 
 We always type-hint narrowest possible interface which we use inside the function or class.
@@ -1242,7 +1202,6 @@ class MyClass
     private string $two;
     private int $three;
     private bool $four;
-    private SomeObject $five;
 
     private DateTimeImmutable $createdAt;
 
@@ -1253,6 +1212,22 @@ class MyClass
         $this->three = 3;
         $this->four = false;
         $this->createdAt = new DateTimeImmutable();
+    }
+}
+```
+or php8
+```php
+class MyClass
+{
+    private const TYPE_TWO = 'two';
+
+    public function __construct(
+        private ArrayCollection $one = new ArrayCollection(),
+        private string $two = self::TYPE_TWO,
+        private int $three = 3,
+        private bool $four = false,
+        private DateTimeImmutable $createdAt = new DateTimeImmutable()
+    ) {
     }
 }
 ```
@@ -1410,11 +1385,9 @@ We use PhpDoc on properties that are not injected via constructor.
 We do *not* put PhpDoc on services, that are type-casted and injected via constructor, as they are automatically
 recognised by IDE and desynchronization between typecast and PhpDoc can cause warnings to be silenced.
 
-If property value is not set in constructor, we must always add `|null` to the PhpDoc of that property.
-
 ### Fluid interface
 
-If method returns `$this`, we use `@return $this` that IDE could guess correct type if we use this method
+If method returns `$this`, we use typehint `: self` that IDE could guess correct type if we use this method
 for objects of sub-classes.
 
 ### Multiple available types
