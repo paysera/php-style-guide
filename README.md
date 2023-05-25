@@ -24,7 +24,6 @@ releasing libraries or requiring ones.
     - [Globals](#globals)
     - [Files](#files)
     - [Exceptions for code style usage](#exceptions-for-code-style-usage)
-    - [Built-in language/framework feature usage](#built-in-languageframework-feature-usage)
   - [Code style](#code-style)
     - [Commas in arrays](#commas-in-arrays)
     - [Splitting in several lines](#splitting-in-several-lines)
@@ -63,13 +62,14 @@ releasing libraries or requiring ones.
     - [Functions](#functions)
       - [`count`](#count)
       - [`is_null`](#is_null)
-    - [String manipulation](#string-manipulation)
+    - [`str_replace`](#str_replace)
     - [Return and argument types](#return-and-argument-types)
       - [Return types](#return-types)
       - [Argument types](#argument-types)
       - [Passing ID](#passing-id)
       - [Type-hinting optional arguments](#type-hinting-optional-arguments)
       - [Void result](#void-result)
+      - [Correct typehinting for possibly uninitialized properties](#correct-typehinting-for-possibly-uninitialized-properties)
     - [Type-hinting classes and interfaces](#type-hinting-classes-and-interfaces)
       - [Dependencies with several interfaces](#dependencies-with-several-interfaces)
     - [Dates](#dates)
@@ -237,7 +237,6 @@ releasing libraries or requiring ones.
   - [Initial library development](#initial-library-development)
   - [Constraints on library versions](#constraints-on-library-versions)
   - [Constraints on vendors](#constraints-on-vendors)
-  - [Library version incrementing](#library-version-incrementing)
 
 <!-- tocstop -->
 
@@ -260,10 +259,6 @@ We put every class to it’s own file.
 ### Exceptions for code style usage
 
 If we modify legacy code where some other conventions are used, we can use the same style as it is used there.
-
-### Built-in language/framework feature usage
-We prefer to use built-in features if they exist instead of inventing our own solutions, unless we need a very specific functionality.
-
 
 ## Code style
 
@@ -301,52 +296,52 @@ Some examples:
 ```php
 <?php
 
-return ($alpha && $beta || $gamma && $delta);
+return ($a && $b || $c && $d);
 
 return (
-    $alpha && $beta
-    || $gamma && $delta
+    $a && $b
+    || $c && $d
 );
 
 return ((
-    $alpha
-    && $beta
+    $a
+    && $b
 ) || (
-    $gamma
-    && $delta
+    $c
+    && $d
 ));
 
 return (
     (
-        $alpha
-        && $beta
+        $a
+        && $b
     )
     || (
-        $gamma
-        && $delta
+        $c
+        && $d
     )
 );
 
-return ($alpha && in_array($beta, [1, 2, 3]));
+return ($a && in_array($b, [1, 2, 3]));
 
 return (
-    $alpha
-    && in_array($beta, [1, 2, 3])
+    $a
+    && in_array($b, [1, 2, 3])
 );
 
-return ($alpha && in_array(
-    $beta,
+return ($a && in_array(
+    $b,
     [1, 2, 3]
 ));
 
-return ($alpha && in_array($beta, [
+return ($a && in_array($b, [
     1,
     2,
     3,
 ]));
 
-return ($alpha && in_array(
-    $beta,
+return ($a && in_array(
+    $b,
     [
         1,
         2,
@@ -355,9 +350,9 @@ return ($alpha && in_array(
 ));
 
 return (
-    $alpha
+    $a
     && in_array(
-        $beta,
+        $b,
         [
             1,
             2,
@@ -591,9 +586,9 @@ Do **not** do this:
 
 ```php
 <?php
-$alpha = $delta && $gamma ? false : true;
+$a = $d && $e ? false : true;
 
-if ($alpha && $beta) {
+if ($a && $b) {
     return true;
 }
 
@@ -604,9 +599,9 @@ Do this:
 
 ```php
 <?php
-$alpha = !($delta && $gamma);
+$a = !($d && $e);
 
-return $alpha && $beta;
+return $a && $b;
 ```
 
 ### Logical operators
@@ -711,8 +706,8 @@ Wrong:
 
 ```php
 <?php
-if (($beta = $alpha->get()) !== null && ($gamma = $beta->get()) !== null) {
-    $gamma->do();
+if (($b = $a->get()) !== null && ($c = $b->get()) !== null) {
+    $c->do();
 }
 if ($project = $this->findProject()) {
 
@@ -723,11 +718,11 @@ Correct:
 
 ```php
 <?php
-$beta = $alpha->get();
-if ($beta !== null) {
-    $gamma = $beta->get();
-    if ($gamma !== null) {
-        $gamma->do();
+$b = $a->get();
+if ($b !== null) {
+    $c = $b->get();
+    if ($c !== null) {
+        $c->do();
     }
 }
 
@@ -913,9 +908,26 @@ if ($result === null) {
     // ...
 ```
 
-### String manipulation
+### `str_replace`
 
-We use `trim, ltrim, rtrim` or whatever is more modern prefix and suffix removal.
+We do not use `str_replace` if we need to remove prefix or suffix - this can lead to replacing more
+content unintentionally.
+
+```php
+<?php
+function removePrefix($text, $prefix)
+{
+    if (substr($text, 0, strlen($prefix)) === $prefix) { // strpos === 0 is also possible
+        $text = substr($text, strlen($prefix));
+    }
+    return $text;
+}
+
+assertSame('Some asd text', removePrefix('asdSome asd text', 'asd'));
+```
+
+We can also use `preg_replace` for this.
+
 ### Return and argument types
 
 #### Return types
@@ -1048,6 +1060,79 @@ function payback($requestId): void
 > **Why?** If method result is not used and you return something anyway, other programmer may assert that return value
 > is indeed taken into account. For example, return `false` on failure, even if this failure is not handled anyhow by
 > the functionality that's calling your method.
+
+#### Correct typehinting for possibly uninitialized properties
+
+If we declare some class property type as not nullable, after that class object construction
+it should never be or become null.
+
+To rephrase from other perspective – if property is not initialized in the constructor, it's type must be nullable.
+
+This also applies for typehints in PhpDoc of properties.
+
+Examples:
+```php
+<?php
+
+declare(strict_types=1);
+
+class SomeClass
+{
+    /**
+     * @var int|null    –> this must include `|null`, as `$id` can be uninitialized
+     */
+    private $id;
+
+    public function getId(): ?int   // return value here must be nullable
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getIdBefore71()
+    {
+        return $this->id;
+    }
+
+    public function setId(int $id): self    // we can use non-nullable type for setter, though
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+}
+```
+
+```php
+<?php
+
+declare(strict_types=1);
+
+class SomeClass
+{
+    /**
+     * @var Child|null
+     */
+    private $child;
+
+    public function getChild(): Child
+    {
+        if ($this->child === null) {
+            throw new RuntimeException('child is not initialized yet');
+        }
+
+        return $this->child;
+    }
+
+    public function hasChild(): bool
+    {
+        return $this->child !== null;
+    }
+}
+```
+
 
 ### Type-hinting classes and interfaces
 
@@ -2985,7 +3070,7 @@ If command name consists of several words, we use dashes to separate them. For e
 
 We register commands as services with dependencies injected into them.
 
-We use lazy loading by always providing attribute with command name in the tag ([see documentation](https://symfony.com/doc/current/console/lazy_commands.html)).
+We use lazy loading by always providing attribute with command name in the tag ([see documentation](https://symfony.com/doc/3.4/console/commands_as_services.html#lazy-loading)).
 
 ## Symfony version and new projects
 
@@ -3485,27 +3570,4 @@ If vendor library has no versions defined, we require specific commit:
 
 ```
 "vendor/package": "dev-master#8e45af93e4dc39c22effdc4cd6e5529e25c31735"
-```
-
-## Library version incrementing
-As long as public API does not change, but dependency of library is not backward compatible anymore its still minor change
-
-Example:
-```
-//Was:
-//...
-"require": {
-    "php": "^7.4",
-},
-"lib-version": "1.2.3"
-//...
-
-//Becomes:
-//...
-"require": {
-    "php": "^8.2",
-},
-"lib-version": "1.2.4"
-//...
-
 ```
