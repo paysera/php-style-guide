@@ -2442,7 +2442,6 @@ or take it from repository and update it.
 ### Creation date
 
 We set `createdAt` property in constructor if we need creation date.
-We can also set `createdAt` in manager if entity is always created in that one place (it should be).
 
 > **Why not Doctrine extension?** This works faster and more reliable.
 > Furthermore, even new not-yet-persisted entities has `createdAt` value, so we can assert that it’s always available.
