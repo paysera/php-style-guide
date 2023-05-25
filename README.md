@@ -451,6 +451,8 @@ We use nouns or adjectives for property names, not verbs or questions.
 
 ```php
 <?php
+declare(strict_types=1);
+
 class Entity
 {
     private bool $valid;       // NOT $isValid
@@ -874,6 +876,8 @@ Example:
 
 ```php
 <?php
+declare(strict_types=1);
+
 class Alpha {
     private int $alpha;      // this must be defined as a property
     public int $beta;       // this is illegal
@@ -951,6 +955,7 @@ Example:
 
 ```php
 <?php
+declare(strict_types=1);
 
 class Service
 {
@@ -963,6 +968,7 @@ class Service
 
 ```php
 <?php
+declare(strict_types=1);
 
 class Entity
 {
@@ -1058,6 +1064,8 @@ If we have dependency on service with several responsibilities (which implements
 we should inject it twice. For example:
 
 ```php
+declare(strict_types=1);
+
 class ResultNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     // ...
@@ -1194,6 +1202,9 @@ If we need to define some default value for class property, we do this in constr
 
 
 ```php
+<?php
+declare(strict_types=1);
+
 class MyClass
 {
     private const TYPE_TWO = 'two';
@@ -1217,6 +1228,9 @@ class MyClass
 ```
 or php8
 ```php
+<?php
+declare(strict_types=1);
+
 class MyClass
 {
     private const TYPE_TWO = 'two';
@@ -1684,6 +1698,8 @@ no `switch` statements, event maps, complex validation rules, nested \`if\`s or 
 
 ```php
 <?php
+declare(strict_types=1);
+
 class Manager
 {
     // simple short methods with clear logic:
@@ -1783,6 +1799,8 @@ no need to put it to all those services.
 Example:
 
 ```php
+declare(strict_types=1);
+
 class Manager
 {
     /**
@@ -2355,6 +2373,8 @@ In this case `set*` contains code to reset collection and `add*` every item in p
 
 ```php
 <?php
+declare(strict_types=1);
+
 class Tree
 {
     private ArrayCollection $leaves;
@@ -2368,7 +2388,7 @@ class Tree
      * @param Leaf[] $leaves we do not typecast to array or Collection as this can be any iterable
      * @return $this
      */
-    public function setLeaves(arrray $leaves): self
+    public function setLeaves(array $leaves): self
     {
         $this->leaves->clear();
         foreach ($leaves as $leaf) {
@@ -2398,6 +2418,8 @@ Constant name starts with property name, followed by the value itself.
 
 ```php
 <?php
+declare(strict_types=1);
+
 class Entity
 {
     public const TYPE_SIMPLE = 'simple';
@@ -2461,6 +2483,7 @@ namespace `Service/`, but in separate namespaces such as `Processor/`.
 
 ```php
 <?php
+declare(strict_types=1);
 
 // namespace Acme\FooBundle\Service; // Incorrect
 namespace Acme\FooBundle\Processor; // Correct
@@ -2527,6 +2550,8 @@ We avoid SQL keywords in table and column names, but leave them as-is in PHP-sid
 
 ```php
 <?php
+declare(strict_types=1);
+
 class Entity
 {
     private string $key;
@@ -2572,14 +2597,14 @@ Example:
 
 -   `PageBundle` has entity `Block`, which has `id` and `providerKey`.
 
--   `BlockManager` has method `renderBlock(Block \$block)` and `addProvider(ProviderInterface \$provider, $key)`.
+-   `BlockManager` has method `renderBlock(Block $block)` and `addProvider(ProviderInterface $provider, $key)`.
 It lives in `PageBundle`. Methods from `ProviderInterface` are used only in this manager,
 (bad: `manager→getProvider(block)→render(block)`, good: `manager→render(block)`).
 This allows to refactor some of the code more easily if needed.
 
 -   There is compiler pass registered, which adds all tagged providers to manager via `addProvider` method.
 
--   `ProviderInterface` lives in `PageBundle` and has single method - `renderBlock(Block \$block)`.
+-   `ProviderInterface` lives in `PageBundle` and has single method - `renderBlock(Block $block)`.
 
 -   `TextBundle` has Entity `TextBlock`, which has fields `block` and `textId`.
 
@@ -2612,6 +2637,7 @@ We store only it's internal fields and recreate it when needed. This makes the c
 
 ```php
 <?php
+declare(strict_types=1);
 
 class Entity
 {
@@ -2624,7 +2650,7 @@ class Entity
         $this->priceCurrency = null;
     }
 
-    public function setPrice(?Money $price = null)
+    public function setPrice(?Money $price = null): self
     {
         if ($price === null) {
             $this->priceAmount = null;
@@ -2633,6 +2659,8 @@ class Entity
             $this->priceAmount = $price->getAmount();
             $this->priceCurrency = $price->getCurrency();
         }
+
+        return $this;
     }
 
     public function getPrice(): ?Money
@@ -2735,6 +2763,8 @@ We pass original representation of variables to view, if view can itself transfo
 
 ```php
 <?php
+declare(strict_types=1);
+
 class Controller
 {
     public function action(): Response
@@ -2798,6 +2828,8 @@ We give constant the same value as the constant name, prefixed with bundle name.
 
 ```php
 <?php
+declare(strict_types=1);
+
 final class PageEvents
 {
     public const PAGE_CREATED = 'evp_page.page_created';
@@ -2818,6 +2850,8 @@ Wrong:
 
 ```php
 <?php
+declare(strict_types=1);
+
 class PageCreatedEvent extends Event
 {
     private Page $page;
@@ -2828,6 +2862,8 @@ Correct:
 
 ```php
 <?php
+declare(strict_types=1);
+
 class PageEvent extends Event
 {
     private Page $page;
@@ -2838,6 +2874,8 @@ Correct, because it has special case of additional property:
 
 ```php
 <?php
+declare(strict_types=1);
+
 class PageChangedEvent extends Event
 {
     private Page $page;
@@ -3007,6 +3045,8 @@ On the server side:
 
 ```php
 <?php
+declare(strict_types=1);
+
 class MainEntity
 {
     protected int $id;
@@ -3032,6 +3072,8 @@ On the client side:
 
 ```php
 <?php
+declare(strict_types=1);
+
 class Entity
 {
     protected int $id;
@@ -3045,6 +3087,8 @@ OR
 
 ```php
 <?php
+declare(strict_types=1);
+
 class Entity
 {
     protected int $id;
@@ -3135,6 +3179,7 @@ following example, but we shouldn't:
 
 ```php
 <?php
+declare(strict_types=1);
 
 namespace Acme\NewsletterBundle\Service;
 
@@ -3168,6 +3213,7 @@ interface UserDataProviderInterface
 
 ```php
 <?php
+declare(strict_types=1);
 
 namespace Acme\NewsletterBundle\Entity;
 
@@ -3205,6 +3251,7 @@ And we refactor our service:
 
 ```php
 <?php
+declare(strict_types=1);
 
 namespace Acme\NewsletterBundle\Service;
 
@@ -3235,6 +3282,8 @@ we do that in another bundle.
 
 ```php
 <?php
+declare(strict_types=1);
+
 namespace Acme\IntegrationBundle\Service;
 
 use Acme\NewsletterBundle\Entity\UserData;
@@ -3267,6 +3316,7 @@ the service in `config.yml`:
 
 ```php
 <?php
+declare(strict_types=1);
 
 namespace Acme\NewsletterBundle\DependencyInjection;
 
@@ -3287,6 +3337,7 @@ class Configuration implements ConfigurationInterface
 
 ```php
 <?php
+declare(strict_types=1);
 
 namespace Acme\NewsletterBundle\DependencyInjection;
 
