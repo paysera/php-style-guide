@@ -446,6 +446,7 @@ We use nouns or adjectives for property names, not verbs or questions.
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 class Entity
@@ -871,6 +872,7 @@ Example:
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 class Alpha {
@@ -967,6 +969,7 @@ Example:
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 class Service
@@ -980,6 +983,7 @@ class Service
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 class Entity
@@ -1288,6 +1292,7 @@ If we need to define some default value for class property, we do this in constr
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 class MyClass
@@ -1314,6 +1319,7 @@ class MyClass
 or php8
 ```php
 <?php
+
 declare(strict_types=1);
 
 class MyClass
@@ -1783,6 +1789,7 @@ no `switch` statements, event maps, complex validation rules, nested \`if\`s or 
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 class Manager
@@ -2458,6 +2465,7 @@ In this case `set*` contains code to reset collection and `add*` every item in p
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 class Tree
@@ -2503,6 +2511,7 @@ Constant name starts with property name, followed by the value itself.
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 class Entity
@@ -2567,6 +2576,7 @@ namespace `Service/`, but in separate namespaces such as `Processor/`.
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 // namespace Acme\FooBundle\Service; // Incorrect
@@ -2634,6 +2644,7 @@ We avoid SQL keywords in table and column names, but leave them as-is in PHP-sid
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 class Entity
@@ -2721,6 +2732,7 @@ We store only it's internal fields and recreate it when needed. This makes the c
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 class Entity
@@ -2847,6 +2859,7 @@ We pass original representation of variables to view, if view can itself transfo
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 class Controller
@@ -2912,6 +2925,7 @@ We give constant the same value as the constant name, prefixed with bundle name.
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 final class PageEvents
@@ -2934,6 +2948,7 @@ Wrong:
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 class PageCreatedEvent extends Event
@@ -2946,6 +2961,7 @@ Correct:
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 class PageEvent extends Event
@@ -2958,6 +2974,7 @@ Correct, because it has special case of additional property:
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 class PageChangedEvent extends Event
@@ -3129,6 +3146,7 @@ On the server side:
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 class MainEntity
@@ -3156,6 +3174,7 @@ On the client side:
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 class Entity
@@ -3171,6 +3190,7 @@ OR
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 class Entity
@@ -3263,6 +3283,7 @@ following example, but we shouldn't:
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 namespace Acme\NewsletterBundle\Service;
@@ -3297,6 +3318,7 @@ interface UserDataProviderInterface
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 namespace Acme\NewsletterBundle\Entity;
@@ -3335,6 +3357,7 @@ And we refactor our service:
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 namespace Acme\NewsletterBundle\Service;
@@ -3366,6 +3389,7 @@ we do that in another bundle.
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 namespace Acme\IntegrationBundle\Service;
@@ -3400,6 +3424,7 @@ the service in `config.yml`:
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 namespace Acme\NewsletterBundle\DependencyInjection;
@@ -3421,6 +3446,7 @@ class Configuration implements ConfigurationInterface
 
 ```php
 <?php
+
 declare(strict_types=1);
 
 namespace Acme\NewsletterBundle\DependencyInjection;
