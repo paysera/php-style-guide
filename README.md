@@ -562,7 +562,7 @@ namespace Some\Namespace;
 
 // ...
 
-public function setSomething(\Vendor\Namespace\Entity\Value $value);
+public function setSomething(\Vendor\Namespace\Entity\Value $value): self;
 ```
 
 Right:
@@ -574,7 +574,7 @@ namespace Some\Namespace;
 
 use Vendor\Namespace\Entity\Value;
 
-public function setSomething(Value $value);
+public function setSomething(Value $value): self;
 ```
 
 ## Usage of PHP features
@@ -746,7 +746,7 @@ Wrong:
 ```php
 <?php
 
-function getSomething(): string
+function getSomething(): ?string
 {
     $a = get();
     return $a;
@@ -758,7 +758,7 @@ Correct:
 ```php
 <?php
 
-function getSomething(): string
+function getSomething(): ?string
 {
     return get();
 }
@@ -1025,6 +1025,8 @@ function getValue(MyObject $object): string
     return $object->get();
 }
 /**
+ * @param int $requestId
+ * @return bool
  * @throws PaybackUnavailableException
  */
 function payback(int $requestId): bool
@@ -1053,9 +1055,10 @@ function getValue(MyObject $object): ?string
     return $object->get();
 }
 /**
+ * @param int $requestId
  * @throws PaybackUnavailableException
  */
-function payback($requestId): void
+function payback(int $requestId): void
 {
     makePayback($requestId);
 }
@@ -1116,10 +1119,7 @@ declare(strict_types=1);
 
 class SomeClass
 {
-    /**
-     * @var Child|null
-     */
-    private $child;
+    private ?Child $child;
 
     public function getChild(): Child
     {
@@ -1688,7 +1688,7 @@ any of parameters in the code itself.
 For example, instead of:
 
 ```php
-class ServiceA
+class ServiceAlpha
 {
     public function doSomething(): void
     {
@@ -1696,7 +1696,7 @@ class ServiceA
         $alpha->doSomething('a');
     }
 }
-class ServiceB
+class ServiceBeta
 {
     public function doSomething(): void
     {
@@ -1704,8 +1704,8 @@ class ServiceB
         $alpha->doSomething('b');
     }
 }
-$alpha = new ServiceA();
-$beta = new ServiceB();
+$alpha = new ServiceAlpha();
+$beta = new ServiceBeta();
 ```
 
 we use:
@@ -3327,6 +3327,14 @@ class UserData
 {
     private string $email;
     private string $name;
+
+    public function __construct(
+        string $email,
+        string $name
+    ) {
+        $this->email = $email;
+        $this->name = $name;
+    }
 
     public function getEmail(): string
     {
