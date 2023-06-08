@@ -1316,26 +1316,6 @@ class MyClass
     }
 }
 ```
-or php8
-```php
-<?php
-
-declare(strict_types=1);
-
-class MyClass
-{
-    private const TYPE_TWO = 'two';
-
-    public function __construct(
-        private ArrayCollection $one = new ArrayCollection(),
-        private string $two = self::TYPE_TWO,
-        private int $three = 3,
-        private bool $four = false,
-        private DateTimeImmutable $createdAt = new DateTimeImmutable()
-    ) {
-    }
-}
-```
 
 ### Scalar typehints
 
