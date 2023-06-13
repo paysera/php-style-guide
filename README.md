@@ -1260,7 +1260,7 @@ Example of parent class, with which calling constructor later would fail:
 /**
  * @var int[] $params
  */
-protected array $params;
+private array $params;
 public function __construct(int $arg1)
 {
     $this->params = [$arg1];
@@ -1613,7 +1613,7 @@ Instead of:
 <?php
 class BadExample
 {
-    protected string $name;
+    private string $name;
     public function setManagerName(string $name): self
     {
         $this->name = $name;
@@ -1878,7 +1878,7 @@ class Manager
     /**
      * @var ProviderInterface[]
      */
-    protected $providers = [];
+    private $providers = [];
 
     public function addProvider(ProviderInterface $provider, string $providerKey): self
     {
@@ -2566,8 +2566,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class FooProcessor
 {
-    protected EntityManagerInterface $entityManager;
-    protected RemoteServiceClient $remoteServiceClient;
+    private EntityManagerInterface $entityManager;
+    private RemoteServiceClient $remoteServiceClient;
 
     public function __construct(EntityManagerInterface $entityManager, RemoteServiceClient $remoteServiceClient)
     {
@@ -3131,22 +3131,22 @@ declare(strict_types=1);
 
 class MainEntity
 {
-    protected int $id;
-    protected string $type;
+    private int $id;
+    private string $type;
 }
 
 class SubEntity
 {
-    protected int $id;
-    protected MainEntity $mainEntity;
-    protected string $subValue;
+    private int $id;
+    private MainEntity $mainEntity;
+    private string $subValue;
 }
 
 class AnotherSubEntity
 {
-    protected int $id;
-    protected MainEntity $mainEntity;
-    protected string $anotherSubValue;
+    private int $id;
+    private MainEntity $mainEntity;
+    private string $anotherSubValue;
 }
 ```
 
@@ -3159,10 +3159,10 @@ declare(strict_types=1);
 
 class Entity
 {
-    protected int $id;
-    protected string $type;
-    protected string $subValue;
-    protected string $anotherSubValue;
+    private int $id;
+    private string $type;
+    private string $subValue;
+    private string $anotherSubValue;
 }
 ```
 
@@ -3179,11 +3179,11 @@ class Entity
 }
 class SubEntity extends Entity
 {
-    protected string $subValue;
+    private string $subValue;
 }
 class AnotherSubEntity extends Entity
 {
-    protected string $anotherSubValue;
+    private string $anotherSubValue;
 }
 ```
 
