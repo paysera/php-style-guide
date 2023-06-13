@@ -974,7 +974,7 @@ declare(strict_types=1);
 
 class Service
 {
-    public function __construct(SomeService $s, ?LoggerInterface $logger = null)
+    public function __construct(SomeService $service, ?LoggerInterface $logger = null)
     {
         //...
     }
