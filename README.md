@@ -988,7 +988,7 @@ declare(strict_types=1);
 
 class Entity
 {
-    public function setValue(?ValueClass $value): self
+    public function setValue(?ValueClass $value = null): self
     {
         //...
         return $this;
