@@ -237,6 +237,8 @@ releasing libraries or requiring ones.
   - [Initial library development](#initial-library-development)
   - [Constraints on library versions](#constraints-on-library-versions)
   - [Constraints on vendors](#constraints-on-vendors)
+  - [Library version incrementing](#library-version-incrementing)
+    - [Why?](#why)
 
 <!-- tocstop -->
 
@@ -3585,3 +3587,11 @@ If vendor library has no versions defined, we require specific commit:
 ```
 "vendor/package": "dev-master#8e45af93e4dc39c22effdc4cd6e5529e25c31735"
 ```
+## Library version incrementing
+
+If the public API does not change, but dependencies do, even if they are breaking backwards compatibility, it’s a minor version bump.
+
+### Why?
+As per https://semver.org/, version incrementing concerns itself only with the public API:
+- Major version X (X.y.z | X > 0) MUST be incremented if any backwards incompatible changes are introduced to the public API.
+- Minor version Y (x.Y.z | x > 0) MUST be incremented if new, backwards compatible functionality is introduced to the public API.
