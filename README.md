@@ -912,8 +912,7 @@ if ($result === null) {
 
 ### `str_replace`
 
-We do not use `str_replace` if we need to remove prefix or suffix - this can lead to replacing more
-content unintentionally. Instead, use `trim`, `ltrim` or `rtrim`.
+We do not use `str_replace` if we need to remove prefix or suffix - this can lead to replacing more content unintentionally. Instead, use `trim`, `ltrim` or `rtrim`.
 
 ### Return and argument types
 
