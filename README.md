@@ -85,6 +85,7 @@ releasing libraries or requiring ones.
       - [Strict types declaration is required](#strict-types-declaration-is-required)
       - [Always use scalar typehints where appropriate](#always-use-scalar-typehints-where-appropriate)
     - [Void typehints](#void-typehints)
+    - [Usage of Built-in Solutions](#usage-of-built-in-solutions)
   - [Comments](#comments)
     - [PhpDoc on methods](#phpdoc-on-methods)
       - [No PhpDoc on fully strictly typed methods](#no-phpdoc-on-fully-strictly-typed-methods)
@@ -913,22 +914,7 @@ if ($result === null) {
 ### `str_replace`
 
 We do not use `str_replace` if we need to remove prefix or suffix - this can lead to replacing more
-content unintentionally.
-
-```php
-<?php
-function removePrefix($text, $prefix)
-{
-    if (substr($text, 0, strlen($prefix)) === $prefix) { // strpos === 0 is also possible
-        $text = substr($text, strlen($prefix));
-    }
-    return $text;
-}
-
-assertSame('Some asd text', removePrefix('asdSome asd text', 'asd'));
-```
-
-We can also use `preg_replace` for this.
+content unintentionally. Instead, use `trim`, `ltrim` or `rtrim`.
 
 ### Return and argument types
 
@@ -1391,6 +1377,13 @@ class SomeClass
     }
 }
 ```
+
+### Usage of Built-in Solutions
+
+We prefer adhering to proprietary solutions or functionalities provided by existing frameworks and libraries, rather than implementing solutions from scratch.
+
+For example:
+Instead of using DOMDocument and manually constructing XML, consider using jms/serializer.
 
 ## Comments
 
