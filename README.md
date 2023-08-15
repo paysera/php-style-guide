@@ -85,7 +85,6 @@ releasing libraries or requiring ones.
       - [Strict types declaration is required](#strict-types-declaration-is-required)
       - [Always use scalar typehints where appropriate](#always-use-scalar-typehints-where-appropriate)
     - [Void typehints](#void-typehints)
-    - [Usage of Built-in Solutions](#usage-of-built-in-solutions)
   - [Comments](#comments)
     - [PhpDoc on methods](#phpdoc-on-methods)
       - [No PhpDoc on fully strictly typed methods](#no-phpdoc-on-fully-strictly-typed-methods)
@@ -1377,13 +1376,6 @@ class SomeClass
     }
 }
 ```
-
-### Usage of Built-in Solutions
-
-We prefer adhering to proprietary solutions or functionalities provided by existing frameworks and libraries, rather than implementing solutions from scratch.
-
-For example:
-Instead of using DOMDocument and manually constructing XML, consider using jms/serializer.
 
 ## Comments
 
