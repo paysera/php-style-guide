@@ -1070,69 +1070,42 @@ function payback(int $requestId): void
 
 #### Correct typehinting for possibly uninitialized properties
 
-If we declare some class property type as not nullable, after that class object construction
-it should never be or become null.
+If we declare some class property type as not nullable, after that class object construction it should never be or become null.
 
-To rephrase from other perspective – if property is not initialized in the constructor, it's type must be nullable.
+If property is nullable it have to be defined as null in constructor to avoid error.
 
 This also applies for typehints in PhpDoc of properties.
 
-Examples:
+Example:
 ```php
-<?php
-
-declare(strict_types=1);
-
-class SomeClass
+class Character
 {
-    /**
-     * @var int|null    –> this must include `|null`, as `$id` can be uninitialized
-     */
-    private $id;
+    private int $id;
+    private ?string $name;
 
-    public function getId(): ?int   // return value here must be nullable
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getIdBefore71()
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id): self    // we can use non-nullable type for setter, though
-    {
+    public function __construct(
+        int $id
+    ) {
         $this->id = $id;
+
+        $this->name = null;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
 
         return $this;
     }
-}
-```
 
-```php
-<?php
-
-declare(strict_types=1);
-
-class SomeClass
-{
-    private ?Child $child;
-
-    public function getChild(): Child
+    public function getName(): ?string
     {
-        if ($this->child === null) {
-            throw new RuntimeException('child is not initialized yet');
-        }
-
-        return $this->child;
-    }
-
-    public function hasChild(): bool
-    {
-        return $this->child !== null;
+        return $this->name;
     }
 }
 ```
