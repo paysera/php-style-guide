@@ -1072,7 +1072,7 @@ function payback(int $requestId): void
 
 If we declare some class property type as not nullable, after that class object construction it should never be or become null.
 
-If property is nullable it have to be defined as null in constructor to avoid error.
+If a property is nullable, it has to be defined as null in the constructor to avoid error
 
 This also applies for typehints in PhpDoc of properties.
 
