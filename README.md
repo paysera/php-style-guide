@@ -1188,32 +1188,64 @@ We use `\DateTimeInterface` where we get the date to be more compatible with fun
 
 #### Throwing
 
-We never throw base `\Exception` class except if we don’t intend for it to be caught.
+We avoid throwing base `\Exception`. Instead, we utilize the narrowest suitable exceptions for specific cases or create custom ones.
 
 #### Catching
 
-We never catch base `\Exception` class except where it’s thrown from vendor code.
+We never catch base `\Exception`.
 
-In any case, we never catch exception if there are few throwing places possible and we only expect one of them.
+We should catch exceptions that we expect and are capable of handling, enabling us to respond appropriately to distinct cases.
 
-Wrong:
+Example:
 
 ```php
-<?php
+declare(strict_types=1);
 
-try {
-    // code
-    // some more code
-    $this->service->someDeepMethod();
-    // more code here
-} catch (\Exception $exception) {
-    return null; // not found
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\ORMException;
+
+interface UserProvider {
+    public function provide(int $id);
+}
+
+class ExceptionHandlingExample {
+
+    public function __construct(
+        EntityManager $entityManager,
+        UserProvider $userProvider,
+        // ...
+    ) {
+        $this->entityManager = $entityManager;
+        $this->userProvider = $userProvider;
+        //...
+    }
+
+    public function wrong(int $id) {
+        // ...
+        try {
+            $this->entityManager->persist($this->userProvider->provide($id));
+        } catch (\Exception $exception) {
+            // ...
+        }
+        // ...
+    }
+
+    public function correct(int $id) {
+        // ...
+        try {
+            $this->entityManager->persist($this->userProvider->provide($id));
+        } catch (ORMException $exception) {
+            // ...
+        }
+        // ...
+    }
 }
 ```
 
-> **Why?** Because usually in these situations tens or hundreds different situations could have gone wrong but
-> we make assumption that it was that single one. This is how we not only make the system behave incorrect on
-> unexpected failures, but also ignore the real problems by not logging them.
+> The example provided illustrates a widely-known case. Similar logic should be applied to all other analogous situations.
+> The reason is that in the incorrect example, if the provider returns null, the entity manager will throw an InvalidArgumentException. This is a logical issue, not a connection lost issue.
+> In the correct example, database connection loss is the only scenario being handled.
+> By adopting this approach to exception catching, we can focus on catching expected occurrences. If null is somehow returned, it will be treated as critical, prompting immediate attention from developers to locate and fix the issue.
 
 ### Checking things explicitly
 
