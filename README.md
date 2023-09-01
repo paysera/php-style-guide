@@ -1192,7 +1192,7 @@ We avoid throwing base `\Exception`. Instead, we utilize the narrowest suitable 
 
 #### Catching
 
-We never catch base `\Exception`.
+We refrain from catching base `\Exception` unless third-party code offers no alternative..
 
 We should catch exceptions that we expect and are capable of handling, enabling us to respond appropriately to distinct cases.
 
