@@ -2360,7 +2360,7 @@ $user->getEmails();  // this will also return *only* active emails, as the user 
 
 What are the options?
 
-1) change `->select('c, a')` to `->select('c')`, so we do not pre-fetch accounts;
+1) change `->select('user, email')` to `->select('user')`, so we do not pre-fetch emails;
 2) pre-fetch them with a separate join:
 Keep in mind that pre-fetching is OK and recommended in most of the cases where we will use those relations.
 It's just not good if we also filter by that relation.
