@@ -2075,9 +2075,10 @@ We use new syntax for defining factory services:
 
 #### ID as FQCN (class name)
 
-We prefer to use FQCN as service id over separate service id value. This helps to avoid boilerplate code and allows
-easier configuration. Service definitions with separate service id definition can still be used if it fits existing
-app configuration style in particular configuration file or bundle / module.
+We prefer to use FQCN (App\Service\MyService) as service id over custom service id value. This helps to avoid 
+boilerplate code and allows easier configuration. Service definitions that use custom service id value 
+("app.bundle.my_service") can still be used if it fits existing app configuration style in particular configuration file
+or bundle / module.
 
 #### Autoconfiguration and autowiring
 
