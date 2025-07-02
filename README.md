@@ -1391,7 +1391,7 @@ public function processTransfers(array $transfers): void;
  * @dataProvider dataProviderForSomeMethodTest
  * @throws Exception    
  */
-public function testSomeMethod(array $input, string $expectation): void;
+public function testSomeMethod(int $input, string $expectation): void;
 ```
 
 #### PhpDoc on arrays
