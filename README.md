@@ -62,7 +62,6 @@ releasing libraries or requiring ones.
     + [Void typehints](#void-typehints)
   * [Comments](#comments)
     + [PhpDoc on methods](#phpdoc-on-methods)
-    + [PhpDoc contents](#phpdoc-contents)
     + [PhpDoc on properties](#phpdoc-on-properties)
     + [Fluid interface](#fluid-interface)
     + [Multiple available types](#multiple-available-types)
@@ -1367,20 +1366,32 @@ public function setNumber(int $number): self;
 
 #### Additional information in PhpDoc
 
-If method description, parameter descriptions or any other PhpDoc tags other than `@param` and `@return` are used
- we will add a full PhpDoc like the following:
+If there is additional information about method which is not available in method signature then only that information
+will be added in PhpDoc as there is no need to duplicate information, eg.
 
 ```php
 /**
  * Gets a day limit starting from midnight.
  *
- * @see http://example.com/
- *
- * @param Client $client
- *
- * @return Money
+ * @see https://example.com/
  */
 public function getDayLimit(Client $client): Money;
+```
+
+```php
+/**
+ * @param Transfer[] $transfers
+ * @throws TransferProcessorException    
+ */
+public function processTransfers(array $transfers): void;
+```
+
+```php
+/**
+ * @dataProvider dataProviderForSomeMethodTest
+ * @throws Exception    
+ */
+public function testSomeMethod(array $input, string $expectation): void;
 ```
 
 #### PhpDoc on arrays
@@ -1391,24 +1402,13 @@ type of elements in the array.
 ```php
 /**
  * @param Client[] $clients
- *
- * @return Money
  */
 public function getDayLimitForClients(array $clients): Money;
 ```
 
-### PhpDoc contents
-
-If we use PhpDoc comment, it must contain all information about parameters, return type and exceptions that the method
-throws. If method does not return anything, we skip `@return` tag.
-
-> sometimes scalar types are not autocompleted by IDE, but must be provided by this requirement.
-> Example: `@param string $param1`
-
-
 ### PhpDoc on properties
 
-We use PhpDoc on properties that are not injected via constructor.
+We use PhpDoc on properties that are not injected via constructor if PHP language level does support nullable strict types.
 
 We do *not* put PhpDoc on services, that are type-casted and injected via constructor, as they are automatically
 recognised by IDE and desynchronization between typecast and PhpDoc can cause warnings to be silenced.
@@ -1416,7 +1416,7 @@ recognised by IDE and desynchronization between typecast and PhpDoc can cause wa
 ### Fluid interface
 
 If method returns `$this`, we use typehint `: self` that IDE could guess correct type if we use this method
-for objects of sub-classes.
+for objects of subclasses.
 
 ### Multiple available types
 
