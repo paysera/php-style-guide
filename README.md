@@ -74,7 +74,7 @@ releasing libraries or requiring ones.
   * [Services without run-time state](#services-without-run-time-state)
   * [Composition over inheritance](#composition-over-inheritance)
   * [Services (objects) over classes, configuration over run-time parameters](#services-objects-over-classes-configuration-over-run-time-parameters)
-    + [Constant usage](#constant-usage)
+    + [Constant usage for rarely changing configuration](#constant-usage-for-rarely-changing-configuration)
   * [Small, understandable methods](#small-understandable-methods)
   * [Dependencies](#dependencies)
     + [No unnecessary dependencies](#no-unnecessary-dependencies)
@@ -1654,11 +1654,63 @@ This allows to reuse already tested code in different scenarios just by reconfig
 
 Of course, we still need to test the configuration itself (functional/integration testing), as it gets more complicated.
 
-### Constant usage
+### Constant usage for rarely changing configuration
 
-We do not store configuration in constants.
+We follow [https://symfony.com/doc/8.0/best_practices.html#use-constants-to-define-options-that-rarely-change](https://symfony.com/doc/8.0/best_practices.html#use-constants-to-define-options-that-rarely-change) best practice:
 
-> **Why?** As configuration can change, it is not constant. Possible situation: `const SOFT = 'soft'; const HARD = 'soft';`
+> Configuration options like the number of items to display in some listing rarely change. Instead of defining them as 
+> configuration parameters, define them as PHP constants in the related classes. Example:
+```php
+// src/Entity/Post.php
+namespace App\Entity;
+
+class Post
+{
+    public const NUMBER_OF_ITEMS = 10;
+
+    // ...
+}
+```
+Configuration parameters should be defined in DI container only if it makes sense to do so, e.g.
+- Configuration value depends on app environment or is taken directly from environment:
+```php
+<services>
+    <service id="Paysera\Component\SomeProvider">
+        <argument>%some_parameter_from_config%</argument>
+    </service>
+
+   <service id="Paysera\Component\SomeManager">
+       <argument>%env(SOME_PARAMETERS)%</argument>
+   </service>
+</services>
+```
+- Different configuration is required to properly test service:
+```php
+class TimeoutAwareClient
+{
+    public function __construct(private readonly int $timeout)
+    {
+    }
+}
+```
+- Configuration value is actually used in multiple service definitions:
+```xml
+<parameters>
+    <parameter key="some_parameter">parameter_value</parameter>
+</parameters>
+
+<services>
+    <service id="Paysera\Component\SomeProvider">
+        <argument>%some_parameter%</argument>
+    </service>
+
+   <service id="Paysera\Component\SomeManager">
+       <argument>%some_parameter%</argument>
+   </service>
+</services>
+```
+This allows to reduce code complexity by removing unnecessary abstractions and also allows usage of constants in 
+Symfony's service container.
 
 ## Small, understandable methods
 
