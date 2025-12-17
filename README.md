@@ -1656,61 +1656,128 @@ Of course, we still need to test the configuration itself (functional/integratio
 
 ### Constant usage for rarely changing configuration
 
-We follow [https://symfony.com/doc/8.0/best_practices.html#use-constants-to-define-options-that-rarely-change](https://symfony.com/doc/8.0/best_practices.html#use-constants-to-define-options-that-rarely-change) best practice:
+We follow the [Symfony best practice](https://symfony.com/doc/8.0/best_practices.html#use-constants-to-define-options-that-rarely-change)
+of using constants for configuration options that rarely change.
 
-> Configuration options like the number of items to display in some listing rarely change. Instead of defining them as 
-> configuration parameters, define them as PHP constants in the related classes. Example:
+#### Why use constants?
+
+- **Type safety**: Constants are checked at compile time, while configuration parameters can have typos
+- **IDE support**: Better autocompletion and refactoring capabilities
+- **Reduced complexity**: No need to manage configuration files for static values
+- **Co-location**: The value lives alongside the code that uses it
+
+#### When to use constants
+
+Use constants when:
+- The value is truly static and doesn't change between environments
+- The value is domain-specific and logically belongs to a class
+- You don't need to override the value for testing
+
 ```php
-// src/Entity/Post.php
-namespace App\Entity;
-
+// Good - constants for static configuration
 class Post
 {
-    public const NUMBER_OF_ITEMS = 10;
+    public const NUMBER_OF_ITEMS_PER_PAGE = 10;
+    public const MAX_TITLE_LENGTH = 255;
+}
 
-    // ...
+class TokenGenerator
+{
+    private const TOKEN_LENGTH = 32;
+    private const TOKEN_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+    public function generate(): string
+    {
+        // uses self::TOKEN_LENGTH and self::TOKEN_ALPHABET
+    }
 }
 ```
-Configuration parameters should be defined in DI container only if it makes sense to do so, e.g.
-- Configuration value depends on app environment or is taken directly from environment:
-```php
-<services>
-    <service id="Paysera\Component\SomeProvider">
-        <argument>%some_parameter_from_config%</argument>
-    </service>
 
-   <service id="Paysera\Component\SomeManager">
-       <argument>%env(SOME_PARAMETERS)%</argument>
-   </service>
+#### When to use DI container parameters
+
+Configuration parameters should be defined in DI container only when necessary:
+
+**1. Value depends on environment or is taken from environment variables:**
+```xml
+<services>
+    <service id="Paysera\Component\ApiClient">
+        <argument>%env(API_BASE_URL)%</argument>
+    </service>
 </services>
 ```
-- Different configuration is required to properly test service:
+
+**2. Different configuration is required for testing:**
+
+When tests need to override a value (e.g., shorter timeouts, different thresholds), inject it as a constructor argument:
 ```php
 class TimeoutAwareClient
 {
-    public function __construct(private readonly int $timeout)
+    public function __construct(private readonly int $timeoutSeconds)
     {
     }
 }
 ```
-- Configuration value is actually used in multiple service definitions:
+```xml
+<!-- services.xml -->
+<service id="Paysera\Component\TimeoutAwareClient">
+    <argument>30</argument>
+</service>
+
+<!-- services_test.xml -->
+<service id="Paysera\Component\TimeoutAwareClient">
+    <argument>1</argument>
+</service>
+```
+
+**3. Value is shared across multiple service definitions:**
 ```xml
 <parameters>
-    <parameter key="some_parameter">parameter_value</parameter>
+    <parameter key="default_page_size">20</parameter>
 </parameters>
 
 <services>
-    <service id="Paysera\Component\SomeProvider">
-        <argument>%some_parameter%</argument>
+    <service id="Paysera\Component\UserListProvider">
+        <argument>%default_page_size%</argument>
     </service>
 
-   <service id="Paysera\Component\SomeManager">
-       <argument>%some_parameter%</argument>
-   </service>
+    <service id="Paysera\Component\TransactionListProvider">
+        <argument>%default_page_size%</argument>
+    </service>
 </services>
 ```
-This allows to reduce code complexity by removing unnecessary abstractions and also allows usage of constants in 
-Symfony's service container.
+
+#### What to avoid
+
+Do not declare constants inside the DI container:
+
+```xml
+<!-- Bad - static value declared in DI container instead of a constant -->
+<parameters>
+    <parameter key="post_max_title_length">255</parameter>
+</parameters>
+
+<services>
+    <service id="Paysera\Component\PostValidator">
+        <argument>%post_max_title_length%</argument>
+    </service>
+</services>
+```
+
+```php
+// Good - use a constant directly
+class PostValidator
+{
+    public function validate(Post $post): void
+    {
+        if (strlen($post->getTitle()) > Post::MAX_TITLE_LENGTH) {
+            // ...
+        }
+    }
+}
+```
+
+Using constants reduces code complexity and provides better IDE support while still allowing constants to be
+used in Symfony's service container when needed.
 
 ## Small, understandable methods
 
