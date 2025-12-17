@@ -74,7 +74,7 @@ releasing libraries or requiring ones.
   * [Services without run-time state](#services-without-run-time-state)
   * [Composition over inheritance](#composition-over-inheritance)
   * [Services (objects) over classes, configuration over run-time parameters](#services-objects-over-classes-configuration-over-run-time-parameters)
-    + [Constant usage](#constant-usage)
+    + [Constant usage for rarely changing configuration](#constant-usage-for-rarely-changing-configuration)
   * [Small, understandable methods](#small-understandable-methods)
   * [Dependencies](#dependencies)
     + [No unnecessary dependencies](#no-unnecessary-dependencies)
@@ -1654,11 +1654,130 @@ This allows to reuse already tested code in different scenarios just by reconfig
 
 Of course, we still need to test the configuration itself (functional/integration testing), as it gets more complicated.
 
-### Constant usage
+### Constant usage for rarely changing configuration
 
-We do not store configuration in constants.
+We follow the [Symfony best practice](https://symfony.com/doc/8.0/best_practices.html#use-constants-to-define-options-that-rarely-change)
+of using constants for configuration options that rarely change.
 
-> **Why?** As configuration can change, it is not constant. Possible situation: `const SOFT = 'soft'; const HARD = 'soft';`
+#### Why use constants?
+
+- **Type safety**: Constants are checked at compile time, while configuration parameters can have typos
+- **IDE support**: Better autocompletion and refactoring capabilities
+- **Reduced complexity**: No need to manage configuration files for static values
+- **Co-location**: The value lives alongside the code that uses it
+
+#### When to use constants
+
+Use constants when:
+- The value is truly static and doesn't change between environments
+- The value is domain-specific and logically belongs to a class
+- You don't need to override the value for testing
+
+```php
+// Good - constants for static configuration
+class Post
+{
+    public const NUMBER_OF_ITEMS_PER_PAGE = 10;
+    public const MAX_TITLE_LENGTH = 255;
+}
+
+class TokenGenerator
+{
+    private const TOKEN_LENGTH = 32;
+    private const TOKEN_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+    public function generate(): string
+    {
+        // uses self::TOKEN_LENGTH and self::TOKEN_ALPHABET
+    }
+}
+```
+
+#### When to use DI container parameters
+
+Configuration parameters should be defined in DI container only when necessary:
+
+**1. Value depends on environment or is taken from environment variables:**
+```xml
+<services>
+    <service id="Paysera\Component\ApiClient">
+        <argument>%env(API_BASE_URL)%</argument>
+    </service>
+</services>
+```
+
+**2. Different configuration is required for testing:**
+
+When tests need to override a value (e.g., shorter timeouts, different thresholds), inject it as a constructor argument:
+```php
+class TimeoutAwareClient
+{
+    public function __construct(private readonly int $timeoutSeconds)
+    {
+    }
+}
+```
+```xml
+<!-- services.xml -->
+<service id="Paysera\Component\TimeoutAwareClient">
+    <argument>30</argument>
+</service>
+
+<!-- services_test.xml -->
+<service id="Paysera\Component\TimeoutAwareClient">
+    <argument>1</argument>
+</service>
+```
+
+**3. Value is shared across multiple service definitions:**
+```xml
+<parameters>
+    <parameter key="default_page_size">20</parameter>
+</parameters>
+
+<services>
+    <service id="Paysera\Component\UserListProvider">
+        <argument>%default_page_size%</argument>
+    </service>
+
+    <service id="Paysera\Component\TransactionListProvider">
+        <argument>%default_page_size%</argument>
+    </service>
+</services>
+```
+
+#### What to avoid
+
+Do not declare constants inside the DI container:
+
+```xml
+<!-- Bad - static value declared in DI container instead of a constant -->
+<parameters>
+    <parameter key="post_max_title_length">255</parameter>
+</parameters>
+
+<services>
+    <service id="Paysera\Component\PostValidator">
+        <argument>%post_max_title_length%</argument>
+    </service>
+</services>
+```
+
+```php
+// Good - use a constant directly
+class PostValidator
+{
+    public function validate(Post $post): void
+    {
+        if (strlen($post->getTitle()) > Post::MAX_TITLE_LENGTH) {
+            // ...
+        }
+    }
+}
+```
+
+Using constants reduces code complexity and provides better IDE support while still allowing constants to be
+used in Symfony's service container when needed.
 
 ## Small, understandable methods
 
