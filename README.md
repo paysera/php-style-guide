@@ -96,6 +96,7 @@ releasing libraries or requiring ones.
     + [Parameters dist files](#parameters-dist-files)
     + [Files](#files-1)
     + [Naming](#naming)
+    + [Application name](#application-name)
     + [Services](#services-1)
     + [Routing](#routing)
     + [Production configuration](#production-configuration)
@@ -2154,6 +2155,41 @@ If type of service is repository, controller, listener or normalizer, these are 
 If service is a manager, registry or some other unique service for that bundle, we use it’s identifier directly without the type.
 
 Valid service names: `acme_page.page_manager`, `acme_page.repository.page`
+
+### Application name
+
+**Do NOT use `app-` prefix as part of application name.** The `app-` prefix is a GitLab repository naming convention,
+not part of the actual application name.
+
+**Do NOT use `-service` suffix as part of application name.** The `-service` suffix is redundant -
+application is already a service in microservice architecture context.
+
+When configuring application name in configuration files, Sentry, Graylog, or any other service -
+use the clean application name without `app-` prefix or `-service` suffix.
+
+Wrong:
+```yaml
+# app/config/config.yml
+parameters:
+    application_name: 'app-user-api-service'
+```
+
+Right:
+```yaml
+# app/config/config.yml
+parameters:
+    application_name: 'user-api'
+```
+
+This parameter is then used in logging configuration:
+```yaml
+logger:
+    application_name: '%application_name%'
+    sentry:
+        dsn: '%env(SENTRY_DSN)%'
+    graylog:
+        hostname: '%env(GRAYLOG_HOSTNAME)%'
+```
 
 ### Services
 
