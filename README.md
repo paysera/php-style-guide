@@ -2237,11 +2237,11 @@ or bundle / module.
 
 #### Autoconfiguration and autowiring
 
-We don't use autowiring and autoconfiguration features of Dependency Injection component.
-
-> **Why?** It might be quicker at the beginning to use it, but to understand the code, we would need to guess where
-> the service really comes from. If we would need to refactor something, it might require to write DI configuration
-> for already (automatically) defined services, too.
+We allow autowiring and autoconfiguration in new projects, but do not enable it in existing projects where it is not already configured.                                                                                                    
+> **Why?** Enabling autowiring and autoconfiguration in a project that was built without it can cause unexpected 
+> service resolution changes, override explicit definitions, and introduce hard-to-debug issues. 
+> Migrating an existing DI configuration to autowiring requires careful review of every service definition, 
+> which carries significant risk of breaking existing behavior with little practical benefit.
 
 ### Routing
 
