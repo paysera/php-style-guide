@@ -4,6 +4,9 @@ Paysera PHP style guide
 Paysera PHP style guide extends [PSR-1](https://www.php-fig.org/psr/psr-1/) and [PSR-12](https://www.php-fig.org/psr/psr-12/),
 so code must also follow these standards to be compatible with this style guide.
 
+The key words "MUST", "MUST NOT", "SHOULD", "SHOULD NOT", and "MAY" in this document
+are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+
 Guide is divided into several parts:
 - [PHP Basics](#php-basics). This defines additional style rules for the code, some restrictions for basic PHP usage;
 - [Main patterns](#main-patterns). This describes patterns and architecture decisions that must be followed;
@@ -25,7 +28,10 @@ releasing libraries or requiring ones.
   * [Code style](#code-style)
     + [Commas in arrays](#commas-in-arrays)
     + [Splitting in several lines](#splitting-in-several-lines)
-    + [Chained method calls](#chained-method-calls)
+    + [Semicolon placement in multiline expressions](#semicolon-placement-in-multiline-expressions)
+      - [Chained method calls](#chained-method-calls)
+      - [Ternary expressions](#ternary-expressions)
+      - [Multiline comparison and logical expressions](#multiline-comparison-and-logical-expressions)
     + [Constructors](#constructors)
     + [Variable, class and function naming](#variable-class-and-function-naming)
     + [Order of methods](#order-of-methods)
@@ -227,12 +233,17 @@ Comma must be after each (including last) element.
 
 ### Splitting in several lines
 
-If we split statement into separate lines, we use these rules:
+See also: [Semicolon placement in multiline expressions](#semicolon-placement-in-multiline-expressions) for semicolon rules on chained calls and ternary expressions.
 
--   `&&`, `||` etc. comes in the beginning of the line, not the end;
+If a statement is split into separate lines, the following rules MUST be followed:
 
--   if we split some condition into separate lines, every part comes in it’s separate line
-(including first - on the new line, and last - new line after). All of the parts are indented.
+-   `&&`, `||` etc. MUST come at the beginning of the line, not the end;
+
+-   if a condition is split into separate lines, every part MUST be on its own line
+(including first — on the new line, and last — new line after). All parts MUST be indented;
+
+-   if the statement spans multiple lines, the closing semicolon MUST be on its own line
+(see [Semicolon placement in multiline expressions](#semicolon-placement-in-multiline-expressions)).
 
 Some examples:
 
@@ -244,7 +255,8 @@ return ($a && $b || $c && $d);
 return (
     $a && $b
     || $c && $d
-);
+)
+;
 
 return ((
     $a
@@ -252,7 +264,8 @@ return ((
 ) || (
     $c
     && $d
-));
+))
+;
 
 return (
     (
@@ -263,25 +276,29 @@ return (
         $c
         && $d
     )
-);
+)
+;
 
 return ($a && in_array($b, [1, 2, 3]));
 
 return (
     $a
     && in_array($b, [1, 2, 3])
-);
+)
+;
 
 return ($a && in_array(
     $b,
     [1, 2, 3]
-));
+))
+;
 
 return ($a && in_array($b, [
     1,
     2,
     3,
-]));
+]))
+;
 
 return ($a && in_array(
     $b,
@@ -290,7 +307,8 @@ return ($a && in_array(
         2,
         3,
     ]
-));
+))
+;
 
 return (
     $a
@@ -302,7 +320,8 @@ return (
             3,
         ]
     )
-);
+)
+;
 ```
 
 This is wrong:
@@ -315,12 +334,19 @@ return [
     ];
 ```
 
-### Chained method calls
+### Semicolon placement in multiline expressions
 
-When making chain method calls, we put semicolon on it’s own separate line,
-each of chained method calls is indented and comes in it’s own line.
+When a statement spans multiple lines, the closing semicolon MUST be placed on its own separate line.
+This rule applies to all multiline expressions: chained method calls, ternary operators,
+comparison expressions, and any other statement that is split across lines.
 
-Example:
+> **Why?**
+> Same as with arrays: allows to easily scan all the parts, reorder or add new ones when needed.
+
+#### Chained method calls
+
+Each chained method call MUST be on its own line, indented once.
+The semicolon MUST be on its own separate line.
 
 ```php
 <?php
@@ -333,8 +359,41 @@ return $this->createQueryBuilder('a')
 ;  // semicolon here
 ```
 
-> **Why?**
-> Same as with arrays: allows to easily scan all the calls, reorder or add new ones when needed.
+#### Ternary expressions
+
+When a ternary expression spans multiple lines, each branch MUST be on its own line, indented once.
+The semicolon MUST be on its own separate line.
+
+```php
+<?php
+// single line – no special rule
+return $condition ? $valueA : $valueB;
+
+// multiline – semicolon on its own line
+return
+    $this->priceAmount !== null && $this->priceCurrency !== null
+    ? new Money($this->priceAmount, $this->priceCurrency)
+    : null
+;
+```
+
+#### Multiline comparison and logical expressions
+
+See also: [Splitting in several lines](#splitting-in-several-lines) for full rules on splitting logical expressions.
+
+When a comparison or logical expression spans multiple lines, the semicolon MUST be placed on its own line.
+
+```php
+<?php
+// single line – no special rule
+$isValid = $a && $b || $c;
+
+// multiline – semicolon on its own line
+$isValid = $conditionA
+    && $conditionB
+    && $conditionC
+;
+```
 
 ### Constructors
 
@@ -2824,9 +2883,11 @@ class Entity
 
     public function getPrice(): ?Money
     {
-        return $this->priceAmount !== null && $this->priceCurrency !== null
+        return
+            $this->priceAmount !== null && $this->priceCurrency !== null
             ? new Money($this->priceAmount, $this->priceCurrency)
-            : null;
+            : null
+        ;
     }
 }
 ```
