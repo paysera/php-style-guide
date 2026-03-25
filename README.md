@@ -809,7 +809,7 @@ If we use double quotes, we do not use auto variable includes (`"Hello $name!"` 
 
 #### Public properties
 
-We don’t use public properties. We avoid magic methods and dynamic properties - all used properties must be defined.
+We don't use public properties. We avoid magic methods and dynamic properties - all used properties must be defined.
 
 Example:
 
@@ -819,13 +819,29 @@ Example:
 declare(strict_types=1);
 
 class Alpha {
-    private int $alpha;      // this must be defined as a property
-    public int $beta;       // this is illegal
+    private int $alpha;  // this must be defined as a property
+    public int $beta;    // this is illegal - use a getter method instead
 
     public function __construct(int $alpha)
     {
         $this->alpha = $alpha;
     }
+}
+```
+
+**Exception:** `public readonly` properties are allowed for DTOs and value objects, as they are immutable and safe.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+class UserData {
+    public function __construct(
+        public readonly string $id,
+        public readonly string $name,
+        public readonly ?string $email,
+    ) {}
 }
 ```
 
