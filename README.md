@@ -375,6 +375,8 @@ We do not use `service` as a suffix, as this does not represent anything (for ex
 
 We use object names only for entities (value objects), not for services (for example `Page`).
 
+If a class implements a commonly known design pattern, it must be suffixed appropriately with the pattern name (e.g., `UserFactory`, `ConfigurationBuilder`, `PaymentObserver`, `ValidationStrategy`). Conversely, if a class is suffixed with a well-known design pattern name, it must properly implement that pattern. This ensures consistency between class naming and actual implementation, making the codebase more predictable and maintainable.
+
 #### Interface naming
 
 We always add suffix `Interface` to interfaces, even if interface name would be adjective.
