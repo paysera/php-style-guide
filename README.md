@@ -153,6 +153,7 @@ releasing libraries or requiring ones.
     + [Naming](#naming-1)
     + [Commands as services](#commands-as-services)
     + [Output and logging in commands](#output-and-logging-in-commands)
+    + [Resource output in commands](#resource-output-in-commands)
   * [Symfony version and new projects](#symfony-version-and-new-projects)
     + [Version and structure](#version-and-structure)
     + [Configuration](#configuration-2)
@@ -3069,6 +3070,36 @@ class SyncDataCommand extends Command
 
             return 1; // returning error code without raising exception is fine if log was logged with "error" level
         }
+    }
+}
+```
+
+### Resource output in commands
+
+Commands that modify resource state should output the latest resource data to the console after a successful
+operation, similar to how REST API endpoints return the updated resource in the response body.
+
+> **Why?** When a developer runs a command that creates or modifies a resource, they need immediate confirmation
+> of what was actually persisted — not just that "it worked". Outputting the resource data (e.g. ID, status,
+> timestamps) eliminates the need for a separate lookup and makes the command self-sufficient. Additionally,
+> the console output serves as a log trail in task management systems — when commands are executed as part of
+> a task, the output is captured and can be referenced later to verify what was done and with what result.
+> This mirrors the REST convention where `POST` and `PUT` responses include the full resource representation.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+class CreateUserCommand extends Command
+{
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $user = $this->userService->create($input->getArgument('email'));
+
+        $output->writeln(json_encode($this->mapToArray($user), JSON_PRETTY_PRINT));
+
+        return 0;
     }
 }
 ```
