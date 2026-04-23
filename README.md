@@ -152,7 +152,7 @@ releasing libraries or requiring ones.
   * [Commands](#commands)
     + [Naming](#naming-1)
     + [Commands as services](#commands-as-services)
-    + [Logging in commands](#logging-in-commands)
+    + [Output and logging in commands](#output-and-logging-in-commands)
   * [Symfony version and new projects](#symfony-version-and-new-projects)
     + [Version and structure](#version-and-structure)
     + [Configuration](#configuration-2)
@@ -2998,9 +2998,9 @@ We register commands as services with dependencies injected into them.
 
 We use lazy loading by always providing attribute with command name in the tag ([see documentation](https://symfony.com/doc/3.4/console/commands_as_services.html#lazy-loading)).
 
-### Logging in commands
+### Output and logging in commands
 
-In single-use or non-cronjob commands, we log errors to stdout (using `$output->writeln()` or Symfony's
+In single-use or non-cronjob commands, we write errors to the console output (using `$output->writeln()` or Symfony's
 `SymfonyStyle`) instead of using the Symfony logger (`LoggerInterface`).
 
 > **Why?** Single-use commands are typically run manually by a developer and their output is observed directly
@@ -3008,7 +3008,7 @@ In single-use or non-cronjob commands, we log errors to stdout (using `$output->
 > systems, cluttering them with one-off operational output and making it harder to find actual log data in
 > infrastructure. Stdout is the natural and expected output channel for commands that are executed on-demand.
 
-Cronjob commands and commands that run unattended should still use `LoggerInterface` for error logging, as their
+Cronjob commands and commands that run unattended should still use `LoggerInterface` for logging, as their
 output needs to be captured and monitored in centralized logging systems.
 
 ```php
@@ -3016,9 +3016,7 @@ output needs to be captured and monitored in centralized logging systems.
 
 declare(strict_types=1);
 
-use Exception;
-
-// Single-use command - log to stdout
+// Single-use command - write to console output
 class ImportDataCommand extends Command
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -3027,9 +3025,9 @@ class ImportDataCommand extends Command
             $this->dataImporter->import();
         } catch (Exception $exception) {
             $formattedOutput = $this->getRelevantInfo($exception);
-            $output->writeln($formattedOutput); // Correct - stdout
+            $output->writeln($formattedOutput); // Correct - console output
 
-            throw $exception; // or return non-zero error code
+            throw $exception; // throw exception instead of returning status code so that fingers-crossed handler is triggered and logs in lower abstraction layers are published
         }
     }
 }
@@ -3037,21 +3035,39 @@ class ImportDataCommand extends Command
 // Cronjob command - use logger
 class SyncDataCommand extends Command
 {
-    public function __construct(private LoggerInterface $logger)
-    {
-        parent::__construct();
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
             $this->dataSynchronizer->sync();
         } catch (Exception $exception) {
-            $this->logger->error('Data sync failed', [ // Correct - logger
-                'exception' => $exception,
-            ]);
+            $this->logger->debug(
+                'Data sync failed',
+                [
+                    'exception' => $exception,
+                ]
+            );
 
-            throw $exception; // or return non-zero error code;
+            throw $exception; // logs in other abstraction layers will be published because of fingers-crossed logging strategy
+        }
+    }
+}
+
+// Cronjob command - alternative error handling
+class SyncDataCommand extends Command
+{
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        try {
+            $this->dataSynchronizer->sync();
+        } catch (Exception $exception) {
+            $this->logger->error(
+                'Data sync failed',
+                [
+                    'exception' => $exception,
+                ]
+            );
+
+            return 1; // returning error code without raising exception is fine if log was logged with "error" level
         }
     }
 }
