@@ -153,6 +153,8 @@ releasing libraries or requiring ones.
   * [Commands](#commands)
     + [Naming](#naming-1)
     + [Commands as services](#commands-as-services)
+    + [Output and logging in commands](#output-and-logging-in-commands)
+    + [Resource output in commands](#resource-output-in-commands)
   * [Symfony version and new projects](#symfony-version-and-new-projects)
     + [Version and structure](#version-and-structure)
     + [Configuration](#configuration-2)
@@ -3167,6 +3169,111 @@ If command name consists of several words, we use dashes to separate them. For e
 We register commands as services with dependencies injected into them.
 
 We use lazy loading by always providing attribute with command name in the tag ([see documentation](https://symfony.com/doc/3.4/console/commands_as_services.html#lazy-loading)).
+
+### Output and logging in commands
+
+In single-use or non-cronjob commands, we write errors to the console output (using `$output->writeln()` or Symfony's
+`SymfonyStyle`) instead of using the Symfony logger (`LoggerInterface`).
+
+> **Why?** Single-use commands are typically run manually by a developer and their output is observed directly
+> in the terminal. Using the Symfony logger in this context adds unnecessary log entries to centralized logging
+> systems, cluttering them with one-off operational output and making it harder to find actual log data in
+> infrastructure. Stdout is the natural and expected output channel for commands that are executed on-demand.
+
+Cronjob commands and commands that run unattended should still use `LoggerInterface` for logging, as their
+output needs to be captured and monitored in centralized logging systems.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+// Single-use command - write to console output
+class ImportDataCommand extends Command
+{
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        try {
+            $this->dataImporter->import();
+        } catch (Exception $exception) {
+            $formattedOutput = $this->getRelevantInfo($exception);
+            $output->writeln($formattedOutput); // Correct - console output
+
+            throw $exception; // throw exception instead of returning status code so that fingers-crossed handler is triggered and logs in lower abstraction layers are published
+        }
+    }
+}
+
+// Cronjob command - use logger
+class SyncDataCommand extends Command
+{
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        try {
+            $this->dataSynchronizer->sync();
+        } catch (Exception $exception) {
+            $this->logger->debug(
+                'Data sync failed',
+                [
+                    'exception' => $exception,
+                ]
+            );
+
+            throw $exception; // logs in other abstraction layers will be published because of fingers-crossed logging strategy
+        }
+    }
+}
+
+// Cronjob command - alternative error handling
+class SyncDataCommand extends Command
+{
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        try {
+            $this->dataSynchronizer->sync();
+        } catch (Exception $exception) {
+            $this->logger->error(
+                'Data sync failed',
+                [
+                    'exception' => $exception,
+                ]
+            );
+
+            return 1; // returning error code without raising exception is fine if log was logged with "error" level
+        }
+    }
+}
+```
+
+### Resource output in commands
+
+Commands that modify resource state should output the latest resource data to the console after a successful
+operation, similar to how REST API endpoints return the updated resource in the response body.
+
+> **Why?** When a developer runs a command that creates or modifies a resource, they need immediate confirmation
+> of what was actually persisted — not just that "it worked". Outputting the resource data (e.g. ID, status,
+> timestamps) eliminates the need for a separate lookup and makes the command self-sufficient. Additionally,
+> the console output serves as a log trail in task management systems — when commands are executed as part of
+> a task, the output is captured and can be referenced later to verify what was done and with what result.
+> This mirrors the REST convention where `POST` and `PUT` responses include the full resource representation.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+class CreateUserCommand extends Command
+{
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $user = $this->userService->create($input->getArgument('email'));
+
+        $output->writeln(json_encode($this->mapToArray($user), JSON_PRETTY_PRINT));
+
+        return 0;
+    }
+}
+```
 
 ## Symfony version and new projects
 
