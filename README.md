@@ -152,6 +152,7 @@ releasing libraries or requiring ones.
   * [Commands](#commands)
     + [Naming](#naming-1)
     + [Commands as services](#commands-as-services)
+    + [Logging in commands](#logging-in-commands)
   * [Symfony version and new projects](#symfony-version-and-new-projects)
     + [Version and structure](#version-and-structure)
     + [Configuration](#configuration-2)
@@ -2996,6 +2997,65 @@ If command name consists of several words, we use dashes to separate them. For e
 We register commands as services with dependencies injected into them.
 
 We use lazy loading by always providing attribute with command name in the tag ([see documentation](https://symfony.com/doc/3.4/console/commands_as_services.html#lazy-loading)).
+
+### Logging in commands
+
+In single-use or non-cronjob commands, we log errors to stdout (using `$output->writeln()` or Symfony's
+`SymfonyStyle`) instead of using the Symfony logger (`LoggerInterface`).
+
+> **Why?** Single-use commands are typically run manually by a developer and their output is observed directly
+> in the terminal. Using the Symfony logger in this context adds unnecessary log entries to centralized logging
+> systems, cluttering them with one-off operational output and making it harder to find actual log data in
+> infrastructure. Stdout is the natural and expected output channel for commands that are executed on-demand.
+
+Cronjob commands and commands that run unattended should still use `LoggerInterface` for error logging, as their
+output needs to be captured and monitored in centralized logging systems.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Exception;
+
+// Single-use command - log to stdout
+class ImportDataCommand extends Command
+{
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        try {
+            $this->dataImporter->import();
+        } catch (Exception $exception) {
+            $formattedOutput = $this->getRelevantInfo($exception);
+            $output->writeln($formattedOutput); // Correct - stdout
+
+            throw $exception; // or return non-zero error code
+        }
+    }
+}
+
+// Cronjob command - use logger
+class SyncDataCommand extends Command
+{
+    public function __construct(private LoggerInterface $logger)
+    {
+        parent::__construct();
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        try {
+            $this->dataSynchronizer->sync();
+        } catch (Exception $exception) {
+            $this->logger->error('Data sync failed', [ // Correct - logger
+                'exception' => $exception,
+            ]);
+
+            throw $exception; // or return non-zero error code;
+        }
+    }
+}
+```
 
 ## Symfony version and new projects
 
