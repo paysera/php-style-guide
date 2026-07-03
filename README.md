@@ -1411,6 +1411,28 @@ public function processTransfers(array $transfers): void;
 public function testSomeMethod(int $input, string $expectation): void;
 ```
 
+The same applies when PhpDoc is already present for other reasons (description, `@throws` etc.) — we do not add
+`@param` annotations for parameters that already have native type declarations.
+
+Wrong:
+```php
+/**
+ * Cancels the transfer.
+ *
+ * @param Transfer $transfer
+ * @param string $reason
+ */
+public function cancelTransfer(Transfer $transfer, string $reason): void;
+```
+
+Correct:
+```php
+/**
+ * Cancels the transfer.
+ */
+public function cancelTransfer(Transfer $transfer, string $reason): void;
+```
+
 #### PhpDoc on arrays
 
 When we take as an argument or return an array of strictly typed elements, we should add a PhpDoc to describe the
