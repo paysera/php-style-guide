@@ -1542,28 +1542,19 @@ Annotations themselves are not affected - type information in `@var`, `@param`, 
 <?php
 
 /**
- * Deciding phone confirmation in one place keeps the log line and its context keys
- * identical across flows.
- *
- * ^ class description is allowed only if written by a human developer
+ * Class description - allowed only if written by a human developer.
  */
-class PhoneManager
+class SomeService
 {
     /**
-     * Blocked or deleted accounts have their contacts cleared on deactivation, so we
-     * refuse the confirmation for every ingress.
+     * Method description - allowed only if written by a human developer.
      *
-     * ^ this description is allowed only if written by a human developer
-     *
-     * @param PhoneNumber[] $phoneNumbers <- description here also only if written by a human
-     * @throws PhoneConfirmationException <- annotation itself is fine
+     * @param Item[] $items parameter description - allowed only if written by a human developer
+     * @throws SomeException
      */
-    public function confirmPhones(int $userId, array $phoneNumbers): void
+    public function process(array $items): void
     {
-        /*
-         * multi-line comments are not used at all, see "Comment styles"
-         */
-        // this is allowed only if written by a human developer
+        // single line comment - allowed only if written by a human developer
     }
 }
 ```
