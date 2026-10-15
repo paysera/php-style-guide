@@ -129,6 +129,7 @@ releasing libraries or requiring ones.
     + [Doctrine migrations](#doctrine-migrations)
     + [ID column strategy](#id-column-strategy)
     + [Variable types for query parameters](#variable-types-for-query-parameters)
+    + [Not equal operator in SQL](#not-equal-operator-in-sql)
   * [Controllers](#controllers)
     + [As services](#as-services)
     + [Static templates](#static-templates)
@@ -2744,6 +2745,36 @@ SELECT * FROM ext_log_entries e0_
 WHERE e0_.object_id = '21590'
       AND e0_.object_class = 'Acme\\UserBundle\\Entity\\User'
 ORDER BY e0_.version DESC;
+```
+
+### Not equal operator in SQL
+
+We use `!=` instead of `<>` in SQL and DQL queries.
+
+> **Why?** Both operators do exactly the same thing. There is no reason to use aliases - they just make code harder
+> to read and increase cognitive load. `!=` is also consistent with the operators we use in PHP code.
+
+```sql
+SELECT * FROM users u
+WHERE u.status <> 'deleted';
+```
+
+Correct usage:
+
+```sql
+SELECT * FROM users u
+WHERE u.status != 'deleted';
+```
+
+```php
+<?php
+
+declare(strict_types=1);
+
+$queryBuilder
+    ->andWhere('u.status != :status')
+    ->setParameter('status', User::STATUS_DELETED)
+;
 ```
 
 ## Controllers
