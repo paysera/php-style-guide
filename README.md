@@ -2025,7 +2025,10 @@ We put configuration files in subdirectories - `services/`, `routing/` etc.
 
 ### Naming
 
-Service ID always begins with bundle identifier, like `acme_newsletter`, followed by dot.
+We prefer FQCN as service ID (see [ID as FQCN (class name)](#id-as-fqcn-class-name)).
+The following rules apply when custom service ID is used.
+
+Custom service ID always begins with bundle identifier, like `acme_newsletter`, followed by dot.
 
 If type of service is repository, controller, listener or normalizer, these are following parts:
 
@@ -2470,17 +2473,23 @@ would break the functionality (or naming).
 
 We always avoid more than one `flush` in one web request.
 
+Exception: when process requires intermediate state to be saved (for example, before or after calling remote
+service), several flushes are allowed. Such functionality must be placed in a processor
+(see [Multiple flushes](#multiple-flushes)).
+
 #### Where to flush
 
-We use `flush` only in controllers, commands and workers.
-These are the top input layer to the system, and is used usually only once per request life-cycle.
+We use `flush` only in controllers, commands, workers and processors.
+Controllers, commands and workers are the top input layer to the system, and is used usually only once per
+request life-cycle.
 Services (and especially listeners) can be used in many different ways, so we cannot make assumption that a few of
 them will not get called in the same request.
 
 #### Multiple flushes
 
 Services that do flush the database or use other services that flush the database (in any depth) should not live in
-namespace `Service/`, but in separate namespaces such as `Processor/`.
+namespace `Service/`, but in separate namespaces such as `Processor/`. This makes it explicit that calling them
+causes changes to be flushed to the database.
 
 ```php
 <?php
@@ -2500,6 +2509,7 @@ class FooProcessor
     public function __construct(EntityManagerInterface $entityManager, RemoteServiceClient $remoteServiceClient)
     {
         $this->entityManager = $entityManager;
+        $this->remoteServiceClient = $remoteServiceClient;
     }
 
     public function process(): void
@@ -3442,7 +3452,8 @@ We tag each and every commit (except instant bug-fixes or commits before separat
     3.2. If we add new feature (any new arguments, method calls, classes etc.), we bump MINOR version.
 
     3.3. If we do not change API of library in any way, just change the internals (usually bug-fixes),
-         we bump PATCH version.
+         we bump PATCH version. Changes of dependencies are an exception - they require MINOR version bump
+         (see [Library version incrementing](#library-version-incrementing)).
 
 We use annotated tags so that time and author would be present. Example command, `1.2.3` taken as example tag:
 
@@ -3487,8 +3498,8 @@ or update code and use (1) or (2) depending on compatibility with `1.0` version.
 Latter is recommended, as this allows to use newest possible versions (sooner or later we will need to update them).
 
 Version in `lib-b` in any of these cases is not required to make a MAJOR bump - if API of `lib-b` is left the same,
-we can make PATCH update. We can even entirely drop out `lib-a` and use some alternative library, as long as API
-leaves the same.
+we make MINOR update (see [Library version incrementing](#library-version-incrementing)).
+We can even entirely drop out `lib-a` and use some alternative library, as long as API leaves the same.
 
 This means that if `app-x` (or any other library) uses functions or classes from `lib-a`,
 it must require it in `composer.json`.
