@@ -1388,9 +1388,9 @@ public function processTransfers(array $transfers): void;
 
 ```php
 /**
- * @dataProvider dataProviderForSomeMethodTest
- * @throws Exception    
+ * @throws Exception
  */
+#[DataProvider('dataProviderForSomeMethodTest')]
 public function testSomeMethod(int $input, string $expectation): void;
 ```
 
@@ -1910,9 +1910,15 @@ We use XML configuration inside bundles.
 
 > **Why not YAML?** We use XML, because it is explicit and has schema definition - many mistakes can be avoided.
 
-> **Why not annotations?** We don’t use annotations, as we want to leave configuration and logic separate.
+> **Why not annotations or attributes?** We don’t use annotations or PHP attributes for configuration (services,
+> routing, Doctrine mapping etc.), as we want to leave configuration and logic separate.
 > Moreover, class and object/service are not the same, this makes it difficult to configure several services
 > for a single class.
+
+Exceptions:
+-   in tests we use PHPUnit attributes, like `#[DataProvider]`;
+-   we use annotations or attributes to configure REST controllers written with
+    [paysera/lib-api-bundle](https://github.com/paysera/lib-api-bundle).
 
 ### Configuration in `app` directory
 
@@ -2075,14 +2081,25 @@ We use new syntax for defining factory services:
 
 #### ID as FQCN (class name)
 
-We prefer to use FQCN (App\Service\MyService) as service id over custom service id value. This helps to avoid 
-boilerplate code and allows easier configuration. Service definitions that use custom service id value 
-("app.bundle.my_service") can still be used if it fits existing app configuration style in particular configuration file
-or bundle / module.
+We prefer to use FQCN (`App\Service\MyService`) as service ID over custom service ID value.
+
+> **Why?** Even without autowiring, this helps to avoid boilerplate code: `class` attribute can be omitted and
+> there is no need to invent and maintain a separate ID for each service. Service ID is obvious from the class name,
+> so it's easy to find service definition and its usages.
+
+```xml
+<service id="App\Service\MyService">
+    <argument type="service" id="App\Repository\MyRepository"/>
+</service>
+```
+
+Service definitions that use custom service ID value ("app.bundle.my_service") can still be used if it fits existing
+app configuration style in particular configuration file or bundle / module.
 
 #### Autoconfiguration and autowiring
 
 We don't use autowiring and autoconfiguration features of Dependency Injection component.
+Even when FQCN is used as service ID, we define each service and its arguments explicitly.
 
 > **Why?** It might be quicker at the beginning to use it, but to understand the code, we would need to guess where
 > the service really comes from. If we would need to refactor something, it might require to write DI configuration
@@ -2092,7 +2109,9 @@ We don't use autowiring and autoconfiguration features of Dependency Injection c
 
 #### Route prefix
 
-We always use bundle name as route prefix, just like in services. We leave out vendor prefix.
+We always use bundle name without vendor prefix as route prefix, for example `page` for `AcmePageBundle`.
+This is the same as prefix for database tables (see [Prefix](#prefix)), but differs from custom service IDs,
+which include vendor prefix.
 
 Exception: we drop out `-common` suffix, if one exists. Routes should not clash with corresponding
 bundle without `-common`.
@@ -3042,7 +3061,7 @@ We can use plain normalizer or plain item normalizer if needed.
 We use result provider to give `Result` entities from REST controller.
 
 Response is automatically normalized using normalizer related to the classname of the returned object.
-We could override it with additional annotation, if needed.
+We could override it with additional annotation or attribute, if needed.
 
 ### Extending model
 
