@@ -1386,15 +1386,14 @@ public function setNumber(int $number): self;
 #### Additional information in PhpDoc
 
 If there is additional information about method which is not available in method signature then only that information
-will be added in PhpDoc as there is no need to duplicate information, e.g.
+will be added in PhpDoc, as tags, as there is no need to duplicate information. PhpDoc carries no description text
+(see [Comment authorship](#comment-authorship)) - the method name says what it does, e.g.
 
 ```php
 /**
- * Gets a day limit starting from midnight.
- *
  * @see https://example.com/
  */
-public function getDayLimit(Client $client): Money;
+public function getDayLimitFromMidnight(Client $client): Money;
 ```
 
 ```php
@@ -1445,16 +1444,11 @@ we provide all of them separated by `|`.
 ```php
 <?php
 /**
- * Description of the method - optional
- *
- * @param string $param1 description of param1. Description is optional, type is required (string)
- *
- * @return SomeObject[]|Collection|null Optional description of return type
+ * @return SomeObject[]|Collection|null
  */
 public function getSomething(string $param1)
 {
-    // ...
-    return $collection;
+    return $this->findCollection($param1);
 }
 ```
 
@@ -1467,12 +1461,9 @@ public function getSomething(string $param1)
 
 ### Deprecations
 
-If method is deprecated, we mark this in PhpDoc as `@deprecated` with description or additional
-`@see` with new method to use. For example:
-
-```php
-@deprecated use DI to create and inject this service
-```
+If method is deprecated, we mark this in PhpDoc as `@deprecated` with additional `@see` with new method to use.
+We do not add description text after `@deprecated` - why it is deprecated goes into the commit message or the merge
+request description. For example:
 
 ```php
 @deprecated
@@ -1481,9 +1472,10 @@ If method is deprecated, we mark this in PhpDoc as `@deprecated` with descriptio
 
 ### Additional comments
 
-We do not add file comments.
+We do not add file or class comments.
 
-> **Why?** We use class comments - they are used if PhpDoc is auto-generated from PHP code, also can be used by IDE.
+> **Why?** The namespace and the class name say what a file holds; a description next to them is a comment
+> (see [Comment authorship](#comment-authorship)).
 
 
 We do not use `@package`, `@namespace`, `@date` or `@author` annotations anywhere.
@@ -1498,60 +1490,72 @@ We do not use `@inheritdoc`.
 
 ### Comment styles
 
-We use multi-line `/** */` comments for method, property and class annotations.
+We use multi-line `/** */` PhpDoc blocks for method, property and class annotations.
 
 We use single-line `/** @var Class $object */` annotation for local variables. We always avoid this if possible -
 usually PhpDoc is enough (sometimes it's missing, for example in vendor code).
 
-We can use `//` single line comments in the code.
+We do not use `//`, `/* */` or `#` comments at all.
 
-We do not use `/* */` or `#` comments at all.
-
-> **Why no multi-line comment?** We try to keep functions small and comment them in PhpDoc.
-> If some things are to be explained in function body, single line comments should be enough.
+> **Why?** Code is written clearly enough not to need them (see [Comment authorship](#comment-authorship)).
 > If we want to comment-out something, we just delete it (and use VCS to revert if needed) or disable functionality
 > in configuration.
 
-Some examples:
+In the example below, the `@var` annotation on the property is multi-line - 3 lines, not 1; the one on the local
+variable is single-line - 1 line, not 3:
 ```php
 <?php
 
 class NewsletterSender
 {
     /**
-     * @var ProcessorInterface[] this must be multiline - 3 lines, not 1
+     * @var ProcessorInterface[]
      */
     private $processors;
+
+    private MailerInterface $mailer;
 
     public function sendNewsletter(Newsletter $newsletter): void
     {
         foreach ($this->processors as $processor) {
-            /** @var Mail $mail this must be single line - 1 line, not 3 */
+            /** @var Mail $mail */
             $mail = $processor->createNamedMail($newsletter->getName());
-            //..
+            $this->mailer->send($mail);
         }
-
-        // we can add single line comments to explain behavior
     }
 }
 ```
 
-We always prefer refactoring code to be understandable over adding some comments to explain it's behavior.
-Most of the cases, code should be clear enough to not need any comments at all.
+We refactor code to be understandable instead of adding comments to explain its behavior.
+Code is clear enough to not need any comments at all.
 
-> **Why should we avoid comments?** They are technical debt - if you cannot keep it updated, it gets stale real quick.
+> **Why no comments?** They are technical debt - if you cannot keep it updated, it gets stale real quick.
 > When you cannot trust some of the comments, you don't know which ones you can really trust.
 
 ### Comment authorship
 
-AI agents write code and code comments by default. A person may write them too, and nobody may forbid either.
-Nobody may be required to write code or comments by hand.
+AI agents write code by default. A person may write code too, and nobody may forbid either.
+Nobody may be required to write code by hand. The person who submits a change answers for all of it.
 
-The person who submits a change answers for every comment in it, whoever wrote it. Every comment meets the same
-bar described above: it is accurate and explains why.
+Whoever writes the code, it carries no comments:
+- no `//`, `/* */` or `#` comments;
+- no description text in PhpDoc blocks on classes, interfaces, traits, constants, properties and methods, including
+  text next to `@param`, `@return`, `@var` and other tags;
+- no `TODO` or `FIXME` notes - open work goes into a Jira ticket.
 
-> **Why?** Whoever wrote a comment, it is the submitter who stands behind it, and reviewers hold it to the same
-> rules as any other comment. Who typed it cannot be checked reliably, so authorship is not a rule we can review.
+Code is written clearly enough - names, small functions, types, value objects - that no comment is needed to say what
+it does, how or why. The why behind a change goes into the commit message, the merge request description, the Jira
+ticket or an ADR.
+
+Machine-read annotations are not comments and stay where the rules above call for them: type information in `@var`,
+`@param`, `@return`, `@throws`, `@deprecated` with `@see`, test annotations such as `@dataProvider`, and tool
+directives such as `@phpstan-ignore` or `phpcs:ignore`.
+
+A comment on code that a change rewrites is removed in that change; untouched code is not swept as a side job.
+
+> **Why?** Code that needs a comment to say what it does, how or why is not clear enough yet. A comment goes stale
+> the moment the code moves on, and the reasoning behind a change is reviewed and kept with the change itself - in the
+> commit, the merge request, the ticket or an ADR.
 
 ## IDE Warnings
 
